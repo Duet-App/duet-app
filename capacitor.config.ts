@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'duet-react',
+  appId: 'xyz.aharish.duet.app',
+  appName: 'Duet',
   webDir: 'dist'
 };
 

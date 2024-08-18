@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">duet-react</string>
-    <string name="title_activity_main">duet-react</string>
-    <string name="package_name">io.ionic.starter</string>
-    <string name="custom_url_scheme">io.ionic.starter</string>
+    <string name="app_name">Duet</string>
+    <string name="title_activity_main">Duet</string>
+    <string name="package_name">xyz.aharish.duet.app</string>
+    <string name="custom_url_scheme">xyz.aharish.duet.app</string>
 </resources>
