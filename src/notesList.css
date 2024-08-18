@@ -1,0 +1,15 @@
+ion-item.noteListItem .icon-wrapper {
+  display: flex;
+  padding: 8px;
+  margin-inline-end: 16px;
+  align-items: center;
+  justify-content: start;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--ion-color-primary);
+}
+
+ion-item.noteListItem .icon-wrapper ion-icon {
+  font-size: 20px;
+}

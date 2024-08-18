@@ -1,0 +1,30 @@
+.CodeMirror {
+  height: calc(99vh - 56px);
+  padding: 16px;
+  font-family: var(--ion-font-family);
+}
+
+.cm-s-material-darker.CodeMirror {
+  background-color: var(--ion-background-color, #000);
+}
+
+.cm-s-material-darker .cm-variable-2 {
+  font-family: mono;
+}
+
+@media (prefers-color-scheme: light) {
+  .cm-s-material-darker.CodeMirror {
+    background-color: #fff;
+    color: #000;
+  }
+
+  .cm-s-material-darker .cm-variable-2 {
+    color: #110000;
+  }
+}
+
+.duet-cm-editor .cm-editor {
+  height: calc(100vh - 56px);
+  padding: 16px;
+  font-family: var(--ion-font-family);
+}

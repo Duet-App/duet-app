@@ -1,0 +1,30 @@
+.datePickerModal {
+    --width: auto;
+    --height: auto;
+}
+
+.subtaskInput .label-text-wrapper {
+    color: var(--ion-color-medium);
+}
+
+ion-modal.smallEditModal {
+    --width: max-content;
+    --min-width: 280px;
+    --max-width: 320px;
+    --height: 300px;
+    --border-radius: 6px;
+    --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+    --backdrop-opacity: 0.6;
+    /* width: 80%;
+    height: 100%;
+    max-height: 400px;
+    aspect-ratio: 9 / 16; */
+}
+
+ion-modal.smallEditModal .wrapper {
+    padding: 16px;
+}
+
+ion-modal.smallEditModal .wrapper ion-textarea {
+    /* --highlight-color-focused: transparent; */
+}

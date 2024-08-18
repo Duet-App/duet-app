@@ -1,0 +1,9 @@
+.duet-editor {
+  padding: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mdxeditor-root-contenteditable > div {
+    color: #fafafa
+  }
+}

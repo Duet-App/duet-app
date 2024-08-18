@@ -1,0 +1,33 @@
+ion-item.md::part(native) {
+  background: transparent;
+}
+
+ion-list.md {
+  background: transparent;
+}
+
+ion-modal.statusPickerModal {
+  --width: max-content;
+  --min-width: 300px;
+  --max-width: 300px;
+  --height: auto;
+  --border-radius: 6px;
+  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+  --backdrop-opacity: 0.6;
+}
+
+ion-modal.statusPickerModal .wrapper {
+  padding: 16px;
+}
+
+ion-modal.statusPickerModal ion-item {
+  --background: transparent;
+}
+
+ion-modal.statusPickerModal ion-list {
+  background: transparent;
+}
+
+hr {
+  background: var(--ion-color-medium);
+}
