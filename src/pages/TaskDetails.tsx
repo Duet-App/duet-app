@@ -7,7 +7,6 @@ import { IonCheckboxCustomEvent, IonDatetimeCustomEvent, IonSelectCustomEvent, O
 import './TaskDetails.css'
 import { archiveOutline, arrowBackSharp, arrowForwardSharp, checkmark, checkmarkCircle, checkmarkSharp, close, closeCircle, closeOutline, closeSharp, ellipsisVerticalSharp, pricetagsOutline, toggle, trashSharp } from 'ionicons/icons'
 import Markdown from 'react-markdown'
-import { useKeyboardState } from '@ionic/react-hooks/keyboard';
 
 interface TaskDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -39,9 +38,6 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   const [projects, setProjects] = useState([])
   const [selectedProject, setSelectedProject] = useState("")
   const [loaded, setLoaded] = useState(false)
-  const { isOpen, keyboardHeight } = useKeyboardState();
-
-  // window.scrollTo(0, keyboardHeight || 0);
 
   useEffect(() => {
     async function getTask() {
