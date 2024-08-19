@@ -1,4 +1,4 @@
-import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, useIonRouter } from '@ionic/react';
+import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter } from '@ionic/react';
 import Welcome from '../components/Home/Welcome';
 import Inbox from '../components/Home/Inbox';
 import Today from '../components/Home/Today';
@@ -12,7 +12,7 @@ import LogbookCard from '../components/Home/Logbook';
 import NotesCard from '../components/Home/Notes';
 import { closeSharp, ellipsisVerticalSharp, helpCircleSharp, informationCircleSharp, settingsSharp } from 'ionicons/icons';
 import ReloadPrompt from '../components/ReloadPrompt';
-import { App } from '@capacitor/app';
+import { App, AppInfo } from '@capacitor/app';
 
 const Home: React.FC = () => {
 
@@ -221,6 +221,11 @@ const Home: React.FC = () => {
     });
   });
 
+  let appInfo: AppInfo
+  App.getInfo().then(value => {
+    appInfo = value
+  })
+
   return (
     <IonPage>
       <IonHeader>
@@ -249,7 +254,7 @@ const Home: React.FC = () => {
 
         <IonActionSheet
           trigger='openActionsSheet'
-          header='Duet v0.9.803 pre-release'
+          header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + 'pre-release' : 'Duet v0.9.803 pre-release'}
           buttons={[
             {
               text: 'Settings',
