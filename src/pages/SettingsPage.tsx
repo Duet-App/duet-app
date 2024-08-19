@@ -1,13 +1,23 @@
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonModal, IonNote, IonPage, IonText, IonTextarea, IonTitle, IonToolbar } from "@ionic/react"
+import { Capacitor } from "@capacitor/core"
+import { Filesystem } from "@capacitor/filesystem"
+import { FilePicker, PickedFile } from "@capawesome/capacitor-file-picker"
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonModal, IonNote, IonPage, IonText, IonTextarea, IonTitle, IonToolbar, isPlatform, useIonToast } from "@ionic/react"
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
-import { useRef } from "react"
+import { useRef, useState } from "react"
 
 const SettingsPage: React.FC = () => {
 
   const db = new PouchDB('duet')
 
   const importModal = useRef<HTMLIonModalElement>(null)
+
+  const [importFile, setImportFile] = useState<PickedFile>()
+  const [noOfProjects, setNoOfProjects] = useState<number>()
+  const [noOfTasks, setNoOfTasks] = useState<number>()
+  const [noOfNotes, setNoOfNotes] = useState<number>()
+
+  const [present] = useIonToast()
 
   function download(data, filename, type) {
     var file = new Blob([data], { type: type });
@@ -44,13 +54,76 @@ const SettingsPage: React.FC = () => {
       reader.onload = ({target: {result}}) => {
         db.bulkDocs(
           JSON.parse(result),
-          {new_edits: false}, // not change revision
+          {new_edits: false}, // do not change revision
           (...args) => console.log('DONE', args)
         );
       };
       reader.readAsText(file);
     }
-  }  
+  }
+
+  const pickImportFiles = async () => {
+    const perms = await Filesystem.checkPermissions()
+    console.log("Permissions", perms)
+    const result = await FilePicker.pickFiles({
+      types: ['application/json'],
+    });
+    console.log(result)
+    setImportFile(result.files[0])
+
+    let filePath = Capacitor.convertFileSrc(result.files[0].path!)
+
+    fetch(filePath)
+    .then(res => res.blob())
+    .then(blob => {
+      const reader = new FileReader();
+      reader.onload = ({target: {result}}) => {
+        const data = JSON.parse(result)
+        let projectsCount = 0
+        let tasksCount = 0
+        let notesCount = 0
+        data.forEach(item => {
+          if(item.type == "project") {
+            projectsCount = projectsCount + 1
+          }
+          if(item.type == 'task') {
+            tasksCount = tasksCount + 1
+          }
+          if(item.type == 'note') {
+            notesCount = notesCount + 1
+          }
+        })
+        setNoOfProjects(projectsCount)
+        setNoOfTasks(tasksCount)
+        setNoOfNotes(notesCount)
+      };
+      reader.readAsText(blob);
+    })
+
+  };
+
+  const importDB = async () => {
+    let filePath = Capacitor.convertFileSrc(importFile?.path!)
+
+    fetch(filePath)
+    .then(res => res.blob())
+    .then(blob => {
+      const reader = new FileReader();
+      reader.onload = ({target: {result}}) => {
+        db.bulkDocs(
+          JSON.parse(result),
+          {new_edits: false}, // do not change revision
+        ).then(response => {
+          present({
+            message: 'Successfully imported',
+            duration: 3000
+          })
+          importModal.current?.dismiss()
+        })
+      };
+      reader.readAsText(blob);
+    })
+  }
 
   return (
     <IonPage>
@@ -62,7 +135,7 @@ const SettingsPage: React.FC = () => {
           <IonTitle>Settings</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className="ion-padding">
+      <IonContent fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Settings</IonTitle>
@@ -70,13 +143,13 @@ const SettingsPage: React.FC = () => {
         </IonHeader>
         <IonList>
           <IonListHeader>Import/Export</IonListHeader>
-          <IonItem onClick={exportDB}>
+          <IonItem onClick={exportDB} button>
             <IonLabel>
               <h2>Export Database</h2>
               <p>Export the database in a JSON format for backing up, or for importing on a different device.</p>
             </IonLabel>
           </IonItem>
-          <IonItem id="importDbModal" lines="none">
+          <IonItem id="importDbModal" lines="none" button>
             <IonLabel>
               <h2>Import Database</h2>
               <p>Import a previously exported Duet database</p>
@@ -86,8 +159,45 @@ const SettingsPage: React.FC = () => {
         </IonList>
 
         <IonModal ref={importModal} trigger="importDbModal">
+          <IonHeader>
+            <IonToolbar>
+              <IonButtons slot='start'>
+                <IonBackButton defaultHref="/" />
+              </IonButtons>
+              <IonTitle>Import file</IonTitle>
+            </IonToolbar>
+          </IonHeader>
           <IonContent className="ion-padding">
-            <input type="file" onChange={handleImport} />
+            <p style={{marginBottom: '16px'}}>Import your previously backed up database. Press the button below to pick the file from your device to import it.</p>
+            {
+              isPlatform('android')
+              ? <>
+                <IonButton expand="block" onClick={pickImportFiles}>Pick file</IonButton>
+                {
+                  importFile && <>
+                    <div style={{marginTop: '24px', display: 'flex', flexDirection: 'column'}}>
+                      <IonText style={{width: '100%'}} color="medium">Filename: {importFile.name}</IonText>
+                      <IonText color="medium">Last modified: {new Date(importFile.modifiedAt!).toLocaleString()}</IonText>
+                      {
+                        noOfProjects || noOfTasks || noOfNotes
+                        ? <>
+                          <div style={{marginTop: '24px', display: 'flex', flexDirection: 'column'}}>
+                            <h4>DB Details:</h4>
+                            <IonText color="medium">Tasks: {noOfTasks}</IonText>
+                            <IonText color="medium">Projects: {noOfProjects}</IonText>
+                            <IonText color="medium">Notes: {noOfNotes}</IonText>
+                            <p>Would you like to import this database?</p>
+                            <IonButton expand="block" onClick={importDB}>Import</IonButton>
+                          </div>
+                        </>
+                        : null
+                      }
+                    </div>
+                  </>
+                }
+              </>
+              : <input type="file" onChange={handleImport} />
+            }
           </IonContent>
         </IonModal>
       </IonContent>
