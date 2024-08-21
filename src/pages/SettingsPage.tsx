@@ -1,10 +1,12 @@
 import { Capacitor } from "@capacitor/core"
-import { Filesystem } from "@capacitor/filesystem"
+import { Directory, Filesystem } from "@capacitor/filesystem"
 import { FilePicker, PickedFile } from "@capawesome/capacitor-file-picker"
 import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonModal, IonNote, IonPage, IonText, IonTextarea, IonTitle, IonToolbar, isPlatform, useIonToast } from "@ionic/react"
+// import { AndroidSettings, NativeSettings } from "capacitor-native-settings"
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
 import { useRef, useState } from "react"
+import StorageAccessFramework from '../plugins/storage-access-framework/index.js';
 
 const SettingsPage: React.FC = () => {
 
@@ -38,14 +40,50 @@ const SettingsPage: React.FC = () => {
   }
 
   const exportDB = () => {
-    db.allDocs({include_docs: true}, (error, doc) => {
-      if (error) console.error(error)
-      else download(
-        JSON.stringify(doc.rows.map(({doc}) => doc)),
-        'export.db',
-        'application/json'
-      )
-    })
+    const timestamp = new Date().toISOString()
+    // db.allDocs({include_docs: true}, (error, doc) => {
+    //   if (error) console.error(error)
+    //   else download(
+    //   )
+    // })
+    db.allDocs({include_docs: true}).then(( async (result) => {
+      if(!isPlatform('capacitor') && !isPlatform('android')) {
+        download(JSON.stringify(result.rows.map(({doc}) => doc)),
+        'duet-' + timestamp + '-db-export.json',
+        'application/json')
+      } else if(isPlatform('capacitor') && isPlatform('android')) {
+        const { uri } = await StorageAccessFramework.saveInFolder({
+          filename: 'Duet/duet-' + timestamp + '-db-export.json',
+          data: JSON.stringify(result.rows.map(({doc}) => doc))
+        });
+        console.log("Response from native: ", uri)
+        try {
+          // await Filesystem.requestPermissions()
+          // NativeSettings.openAndroid({
+          //   option: AndroidSettings.ApplicationDetails
+          // })
+          // const folder = await Filesystem.mkdir({
+          //   path: 'Duet',
+          //   directory: Directory.External
+          // })
+        } catch (e) {
+          // console.log(e)
+          // present({
+          //   message: 'Permission denied',
+          //   duration: 3000
+          // })
+        }
+        // await Filesystem.writeFile({
+        //   path: 'Duet/duet-' + timestamp + '-db-export.json',
+        //   data: JSON.stringify(result.rows.map(({doc}) => doc)),
+        //   directory: Directory.External
+        // })
+        // present({
+        //   message: 'Downloaded to ' + 'duet-' + timestamp + '-db-export.json',
+        //   duration: 3000
+        // })
+      }
+    }))
   }
 
   const handleImport = ({target: {files: [file]}}) => {
