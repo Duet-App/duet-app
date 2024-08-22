@@ -215,7 +215,9 @@ const Home: React.FC = () => {
 
   document.addEventListener('ionBackButton', (ev) => {
     ev.detail.register(-1, () => {
-      App.exitApp();
+      if (!router.canGoBack()) {
+        App.exitApp();
+      }
     });
   });
 
