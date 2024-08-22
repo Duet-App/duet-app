@@ -47,7 +47,7 @@ const SettingsPage: React.FC = () => {
     //   )
     // })
     db.allDocs({include_docs: true}).then(( async (result) => {
-      if(!isPlatform('capacitor') && !isPlatform('android')) {
+      if(isPlatform('mobileweb' || 'pwa')) {
         download(JSON.stringify(result.rows.map(({doc}) => doc)),
         'duet-' + timestamp + '-db-export.json',
         'application/json')
