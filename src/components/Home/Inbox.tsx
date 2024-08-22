@@ -1,5 +1,5 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonRow, IonText } from "@ionic/react"
-import { useEffect, useState } from "react"
+import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonRow, IonText, useIonViewDidEnter } from "@ionic/react"
+import { useState } from "react"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 
@@ -10,7 +10,7 @@ const Inbox: React.FC = () => {
 
   const [inboxTasksCount, setInboxTasksCount] = useState(0)
 
-  useEffect(() => {
+  useIonViewDidEnter(() => {
     function getInboxTasks() {
       db.find({
         selector: {
