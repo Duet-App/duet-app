@@ -142,7 +142,9 @@ const Inbox: React.FC = () => {
           !isLoaded
           ? <TasksSkeletonLoader />
           : inboxTasks.length == 0
-          ? <IonText color='medium'>Your inbox is clear! Add new tasks using the blue button below.</IonText>
+          ? <div className="ion-padding">
+            <IonText color='medium'>Your inbox is clear! Add new tasks using the blue button below.</IonText>
+          </div>
           : <IonList>
             {
               inboxTasks.map(task => {

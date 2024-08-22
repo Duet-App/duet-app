@@ -119,7 +119,9 @@ const ProjectsPage: React.FC = () => {
               </IonItem>
             )
           })
-          : <IonText>No projects found! Create a new project by pressing the + button below.</IonText>
+          : <div className="ion-padding">
+            <IonText color="medium">No projects found! Create a new project by pressing the + button below.</IonText>
+          </div>
         }
 
         <IonFab slot='fixed' vertical='bottom' horizontal='end'>

@@ -63,7 +63,9 @@ const Upcoming: React.FC = () => {
         </IonHeader>
         {
           upcomingTasks.length == 0
-          ? <IonText color='medium'>No upcoming tasks. Add new tasks using the blue button below.</IonText>
+          ? <div className="ion-padding">
+            <IonText color='medium'>No upcoming tasks. Add new tasks using the blue button below.</IonText>
+          </div>
           : <IonList>
             {
               upcomingTasks.map(task => {
