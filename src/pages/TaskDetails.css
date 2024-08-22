@@ -1,5 +1,6 @@
 .datePickerModal {
-    --width: auto;
+    --width: 320px;
+    --min-height: 320px;
     --height: auto;
 }
 
