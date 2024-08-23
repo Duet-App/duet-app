@@ -1,4 +1,4 @@
-import { IonActionSheet, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonModal, IonPage, IonRadio, IonRadioGroup, IonTextarea, IonToolbar, TextareaChangeEventDetail, TextareaCustomEvent, useIonViewDidEnter } from "@ionic/react"
+import { IonActionSheet, IonAlert, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonModal, IonPage, IonRadio, IonRadioGroup, IonTextarea, IonToolbar, TextareaChangeEventDetail, TextareaCustomEvent, useIonRouter, useIonViewDidEnter } from "@ionic/react"
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react"
 import Markdown from "react-markdown"
 import PouchDB from 'pouchdb'
@@ -24,6 +24,8 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
   const db = new PouchDB('duet')
   PouchDB.plugin(PouchFind)
 
+  const router = useIonRouter()
+
   const [note, setNote] = useState({})
   const [editedTitle, setEditedTitle] = useState("")
   const [editedDescription, setEditedDescription] = useState("")
@@ -37,6 +39,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
   // const descEditor = useRef<MDXEditorMethods>(null)
   const descEditor = useRef()
   const descWrapper = useRef(null)
+  const deleteNoteConfirmation = useRef<HTMLIonAlertElement>(null)
   const [descEditorState, setDescEditorState] = useState()
 
   useIonViewDidEnter(() => {
@@ -169,6 +172,14 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
     }
   }
 
+  const deleteNote = () => {
+    db.remove(note).then(response => {
+      if(response.ok) {
+        router.goBack()
+      }
+    })
+  }
+
   useEffect(() => {
     if(descEditor.current) {
       descEditor.current.focus()
@@ -213,6 +224,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
               icon: trashSharp,
               role: 'destructive',
               data: {
+                action: 'delete-note'
               }
             },
             {
@@ -226,6 +238,8 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
           onDidDismiss={({detail}) => {
             if(detail.data?.action == 'move-to-project') {
               projectPickerModal.current?.present()
+            } else if(detail.data?.action == 'delete-note') {
+              deleteNoteConfirmation.current?.present()
             }
           }}
         ></IonActionSheet>
@@ -409,6 +423,27 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
             </IonList>
           </IonContent>
         </IonModal>
+        <IonAlert
+          ref={deleteNoteConfirmation}
+          // trigger="task-delete-confirmation"
+          header="Delete Note?"
+          message="This will permanently remove the note. Do you wish to continue?"
+          buttons={[
+            {
+              text: 'Cancel',
+              role: 'cancel',
+            },
+            {
+              text: 'Delete',
+              role: 'confirm'
+            }
+          ]}
+          onDidDismiss={({detail}) => {
+            if(detail.role == 'confirm') {
+              deleteNote()
+            }
+          }}
+        ></IonAlert>
       </IonContent>
 
     </IonPage>
