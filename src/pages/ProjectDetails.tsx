@@ -1,12 +1,14 @@
-import { IonBackButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonToolbar, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, useIonViewDidEnter } from "@ionic/react"
 import { RouteComponentProps } from "react-router"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { formatDistance } from "date-fns"
-import { add } from "ionicons/icons"
+import { add, checkmark, checkmarkSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
+import './ProjectDetails.css'
+import Markdown from "react-markdown"
 
 interface ProjectDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -22,6 +24,11 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
   const [projectNotes, setProjectNotes] = useState([])
   const [completedProjectTasks, setCompletedProjectTasks] = useState([])
 
+  const [description, setDescription] = useState("")
+
+  const [projectDescEditing, setProjectDescEditing] = useState(false)
+  const projectDescEditor = useRef<HTMLIonTextareaElement>(null)
+
   useIonViewDidEnter(() => {
     getProject()
   })
@@ -29,6 +36,7 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
   async function getProject() {
     const doc = await db.get(match.params.id, {latest: true})
     setProject(doc)
+    setDescription(doc.description)
     getProjectTasks()
     getProjectNotes()
   }
@@ -68,6 +76,25 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
     }
   }
 
+  const updateProjectDescription = async () => {
+    const timestamp = new Date().toISOString()
+    
+    const response = await db.put({
+      ...project,
+      description: description,
+      timestamps: {
+        ...project.timestamps,
+        updated: timestamp,
+      }
+    })
+    if(response.ok) {
+      const newProject = await db.get(project._id, {latest: true})
+      setProject(newProject)
+      setDescription(newProject.description)
+      setProjectDescEditing(false)
+    }
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -80,7 +107,26 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
       <IonContent fullscreen>
         <div style={{padding: '16px 16px 0'}}>
           <h3>{project.title}</h3>
-          <p style={{color: project.description ? 'initial' : 'var(--ion-color-medium)'}}>{project.description ? project.description : 'Tap to set a description'}</p>
+          {
+            !projectDescEditing
+            ? <div
+              style={{color: project.description ? 'initial' : 'var(--ion-color-medium)'}}
+              onClick={() => {
+                setProjectDescEditing(true)
+              }}
+            >
+              <Markdown
+              >
+                {project.description ? project.description : 'Tap to set a description'}
+              </Markdown>
+            </div>
+            : <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8}}>
+              <IonTextarea ref={projectDescEditor} value={description} onIonInput={(e) => {setDescription(e.detail.value!)}} aria-label="Description" placeholder="Enter description" autoGrow={true} rows={1}></IonTextarea>
+              <IonButton size="small" onClick={updateProjectDescription}>
+                <IonIcon slot="icon-only" icon={checkmarkSharp}></IonIcon>
+              </IonButton>
+            </div>
+          }
         </div>
 
         {
