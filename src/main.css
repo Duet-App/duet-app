@@ -31,3 +31,11 @@ ion-modal.statusPickerModal ion-list {
 hr {
   background: var(--ion-color-medium);
 }
+
+ion-header.ion-no-border {
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+ion-header.ion-no-border ion-toolbar {
+  --background: var(--ion-background-color, var(--ion-background-color, #fff));
+}
