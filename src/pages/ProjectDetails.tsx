@@ -7,7 +7,6 @@ import { formatDistance } from "date-fns"
 import { add, checkmark, checkmarkSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
-import './ProjectDetails.css'
 import Markdown from "react-markdown"
 
 interface ProjectDetailsPageProps extends RouteComponentProps<{
