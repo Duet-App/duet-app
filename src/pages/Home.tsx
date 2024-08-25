@@ -1,18 +1,12 @@
-import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter } from '@ionic/react';
-import Welcome from '../components/Home/Welcome';
-import Inbox from '../components/Home/Inbox';
-import Today from '../components/Home/Today';
-import UpcomingCard from '../components/Home/Upcoming';
-import ProjectsCard from '../components/Home/Projects';
+import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from '@ionic/react';
 import './Home.css';
 import React, { useState } from 'react';
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
-import LogbookCard from '../components/Home/Logbook';
-import NotesCard from '../components/Home/Notes';
 import { closeSharp, ellipsisVerticalSharp, helpCircleSharp, informationCircleSharp, settingsSharp } from 'ionicons/icons';
 import ReloadPrompt from '../components/ReloadPrompt';
 import { App, AppInfo } from '@capacitor/app';
+import HomeCardsUI from '../components/Home/CardsUI';
 
 const Home: React.FC = () => {
 
@@ -239,14 +233,7 @@ const Home: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <Welcome />
-        <Today /> 
-        <Inbox />
-        <UpcomingCard />
-        <ProjectsCard />
-        <NotesCard />
-        <LogbookCard />
-
+        <HomeCardsUI />
         <IonActionSheet
           trigger='openActionsSheet'
           header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + 'pre-release' : 'Duet v0.9.804 pre-release'}
