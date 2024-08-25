@@ -33,7 +33,13 @@ hr {
 }
 
 ion-header.ion-no-border {
-  border-bottom: 1px solid var(--ion-color-light-shade);
+  border-bottom: 1px solid var(--ion-color-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  ion-header.ion-no-border {
+    border-bottom: 1px solid var(--ion-color-light-shade);
+  }
 }
 
 ion-header.ion-no-border ion-toolbar {
