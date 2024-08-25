@@ -7,7 +7,7 @@ ion-item.noteListItem .icon-wrapper {
   position: relative;
   overflow: hidden;
   border-radius: 50%;
-  background: var(--ion-color-primary);
+  background: var(--ion-color-light-shade);
 }
 
 ion-item.noteListItem .icon-wrapper ion-icon {
