@@ -228,7 +228,7 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className='ion-no-border'>
         <IonToolbar>
           <IonTitle>Duet</IonTitle>
           <IonButtons slot='end'>

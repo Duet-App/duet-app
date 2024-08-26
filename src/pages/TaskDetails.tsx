@@ -387,7 +387,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className='ion-no-border'>
         <IonToolbar>
           <IonButtons slot='start'>
             <IonBackButton defaultHref='/'></IonBackButton>
@@ -711,7 +711,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
           </IonContent>
         </IonModal>
         <IonModal ref={projectPickerModal} onWillDismiss={(ev) => onWillDissmissProjectPickerModal(ev)} initialBreakpoint={0.35} breakpoints={[0, 0.35, 1]}>
-          <IonHeader>
+          <IonHeader className='ion-no-border'>
             <IonToolbar>
               <IonButtons slot='start'>
                 <IonButton onClick={() => {projectPickerModal.current?.dismiss(null, 'cancel')}}>

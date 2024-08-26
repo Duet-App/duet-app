@@ -74,7 +74,7 @@ const AddTask: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot='start'>
             <IonBackButton defaultHref="/"></IonBackButton>

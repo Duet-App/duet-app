@@ -165,7 +165,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot='start'>
             <IonBackButton defaultHref="/" />
@@ -197,7 +197,7 @@ const SettingsPage: React.FC = () => {
         </IonList>
 
         <IonModal ref={importModal} trigger="importDbModal">
-          <IonHeader>
+          <IonHeader className="ion-no-border">
             <IonToolbar>
               <IonButtons slot='start'>
                 <IonBackButton defaultHref="/" />

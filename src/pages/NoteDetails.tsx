@@ -188,7 +188,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
 
   return (
     <IonPage>
-      <IonHeader>
+      <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot='start'>
             <IonBackButton defaultHref="/"></IonBackButton>
@@ -245,7 +245,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
         ></IonActionSheet>
 
         <IonModal ref={titleEditModal} trigger="openTitleEditModal" onWillDismiss={(ev) => onWillDismissTitleEditModal(ev)}>
-          <IonHeader>
+          <IonHeader className="ion-no-border">
             <IonToolbar>
               <IonButtons slot="start">
                 <IonButton onClick={() => titleEditModal.current?.dismiss(null, 'cancel')}>
@@ -284,7 +284,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
             }
           }
         }>
-          <IonHeader>
+          <IonHeader className="ion-no-border">
             <IonToolbar>
               <IonButtons slot="start">
                 <IonButton onClick={() => descriptionEditModal.current?.dismiss(null, 'cancel')}>
@@ -393,7 +393,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
           </IonContent>
         </IonModal>
         <IonModal ref={projectPickerModal} onWillDismiss={(ev) => onWillDissmissProjectPickerModal(ev)} initialBreakpoint={0.35} breakpoints={[0, 0.35, 1]}>
-          <IonHeader>
+          <IonHeader className="ion-no-border">
             <IonToolbar>
               <IonButtons slot='start'>
                 <IonButton onClick={() => {projectPickerModal.current?.dismiss(null, 'cancel')}}>
