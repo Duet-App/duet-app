@@ -1,12 +1,14 @@
 import { Capacitor } from "@capacitor/core"
 import { Directory, Filesystem } from "@capacitor/filesystem"
 import { FilePicker, PickedFile } from "@capawesome/capacitor-file-picker"
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonModal, IonNote, IonPage, IonText, IonTextarea, IonTitle, IonToolbar, isPlatform, useIonToast } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonListHeader, IonModal, IonNote, IonPage, IonSelect, IonSelectOption, IonText, IonTextarea, IonTitle, IonToolbar, SelectChangeEventDetail, isPlatform, useIonToast, useIonViewDidEnter } from "@ionic/react"
 // import { AndroidSettings, NativeSettings } from "capacitor-native-settings"
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
 import { useRef, useState } from "react"
 import StorageAccessFramework from '../plugins/storage-access-framework/index.js';
+import { Preferences } from "@capacitor/preferences"
+import { IonSelectCustomEvent } from "@ionic/core"
 
 const SettingsPage: React.FC = () => {
 
@@ -19,7 +21,34 @@ const SettingsPage: React.FC = () => {
   const [noOfTasks, setNoOfTasks] = useState<number>()
   const [noOfNotes, setNoOfNotes] = useState<number>()
 
+  const [homeUIPreference, setHomeUIPreference] = useState("")
+
   const [present] = useIonToast()
+
+  const getHomeUIPref = async () => {
+    const { value } = await Preferences.get({ key: 'homeUI' })
+    return value;
+  }
+
+  const setHomeUIPref = async (homeUISetting: string) => {
+    await Preferences.set({
+      key: 'homeUI',
+      value: homeUISetting
+    })
+  }
+
+  const updateHomeScreenPref = async (e: IonSelectCustomEvent<SelectChangeEventDetail>) => {
+    setHomeUIPreference(e.target.value)
+    await (setHomeUIPref(e.target.value))
+  }
+
+  useIonViewDidEnter(() => {
+    async function getSettings() {
+      const homeUIPref = await getHomeUIPref()
+      setHomeUIPreference(homeUIPref!)
+    }
+    getSettings()
+  })
 
   function download(data, filename, type) {
     var file = new Blob([data], { type: type });
@@ -174,11 +203,15 @@ const SettingsPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Settings</IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <IonList>
+          <IonListHeader>User Interface</IonListHeader>
+          <IonItem button>
+            <IonSelect value={homeUIPreference} interface="popover" label="Homescreen Interface" onIonChange={(e) => {updateHomeScreenPref(e)}}>
+              <IonSelectOption value="list">List</IonSelectOption>
+              <IonSelectOption value="cards">Cards</IonSelectOption>
+            </IonSelect>
+          </IonItem>
+        </IonList>
         <IonList>
           <IonListHeader>Import/Export</IonListHeader>
           <IonItem onClick={exportDB} button>

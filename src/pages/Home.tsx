@@ -1,14 +1,28 @@
 import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from '@ionic/react';
 import './Home.css';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
 import { closeSharp, ellipsisVerticalSharp, helpCircleSharp, informationCircleSharp, settingsSharp } from 'ionicons/icons';
 import ReloadPrompt from '../components/ReloadPrompt';
 import { App, AppInfo } from '@capacitor/app';
+import { Preferences } from '@capacitor/preferences';
 import HomeCardsUI from '../components/Home/CardsUI';
+import HomeListUI from '../components/Home/ListUI';
 
 const Home: React.FC = () => {
+
+  const getHomeUIPref = async () => {
+    const { value } = await Preferences.get({ key: 'homeUI' })
+    return value;
+  }
+
+  const setHomeUIPref = async (homeUISetting: string) => {
+    await Preferences.set({
+      key: 'homeUI',
+      value: homeUISetting
+    })
+  }
 
   const db = new PouchDB('duet')
   PouchDB.plugin(PouchFind)
@@ -212,6 +226,7 @@ const Home: React.FC = () => {
   setupProjectsNotesDDoc()
 
   const router = useIonRouter()
+  const [homeUI, setHomeUI] = useState("list")
 
   document.addEventListener('ionBackButton', (ev) => {
     ev.detail.register(-1, () => {
@@ -226,6 +241,19 @@ const Home: React.FC = () => {
     appInfo = value
   })
 
+  useIonViewDidEnter(() => {
+    async function getHomeUI() {
+      const pref = await getHomeUIPref()
+      if(pref == null) {
+        await setHomeUIPref("list")
+        setHomeUI("list")
+        return
+      }
+      setHomeUI(pref!)
+    }
+    getHomeUI()
+  }, [])
+
   return (
     <IonPage>
       <IonHeader className='ion-no-border'>
@@ -239,7 +267,11 @@ const Home: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <HomeCardsUI />
+        {
+          (homeUI == 'list')
+          ? <HomeListUI />
+          : <HomeCardsUI />
+        }
         <IonActionSheet
           trigger='openActionsSheet'
           header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + 'pre-release' : 'Duet v0.9.804 pre-release'}
