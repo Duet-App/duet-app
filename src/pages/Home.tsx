@@ -37,6 +37,12 @@ const Home: React.FC = () => {
       fields: ['type']
     }
   })
+  db.createIndex({
+    index: {
+      fields: ['timestamps.updated'],
+      type: 'json'
+    }
+  })
 
   const tags_ddoc = {
     "_id": "_design/tags-ddoc",
