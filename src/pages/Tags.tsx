@@ -38,11 +38,6 @@ const TagsPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
-        <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Tags</IonTitle>
-          </IonToolbar>
-        </IonHeader>
 
         <IonList>
           {

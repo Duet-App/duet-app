@@ -53,11 +53,6 @@ const AddNote: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
-        <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Add Note</IonTitle>
-          </IonToolbar>
-        </IonHeader>
 
         <IonInput fill="solid" ref={input} value={title} onIonInput={(e: IonInputCustomEvent<InputInputEventDetail>) => setTitle(e.detail.value || '')} label="Note title" labelPlacement="floating" placeholder="Enter the note's title" autoFocus={true} autocapitalize='sentences' autoCorrect="on" style={{marginBottom: '12px'}}></IonInput>
 

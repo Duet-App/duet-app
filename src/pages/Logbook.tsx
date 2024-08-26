@@ -73,11 +73,6 @@ const LogbookPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className='ion-padding'>
-        <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Logbook</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         {
           inboxTasks.length == 0
           ? <IonText color='medium'>Your Logbook is empty. Complete some tasks for them to show up here.</IonText>

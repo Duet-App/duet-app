@@ -203,11 +203,6 @@ const Today: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Today</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         {
           filteredOverdueTasks.length > 0
           ? <IonList style={{marginBottom: 24}}>

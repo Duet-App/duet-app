@@ -44,11 +44,6 @@ const NotesPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Notes</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         {
           notes.length > 0
           ?  <IonList>

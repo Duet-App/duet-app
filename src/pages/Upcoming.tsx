@@ -56,11 +56,6 @@ const Upcoming: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Upcoming</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         {
           upcomingTasks.length == 0
           ? <div className="ion-padding">

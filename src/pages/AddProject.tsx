@@ -51,11 +51,6 @@ const AddProject: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className="ion-padding">
-        <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Add Project</IonTitle>
-          </IonToolbar>
-        </IonHeader>
 
         <IonInput fill="solid" ref={input} value={title} onIonInput={(e: IonInputCustomEvent<InputInputEventDetail>) => setTitle(e.detail.value || '')} label="Task title" labelPlacement="floating" placeholder="Enter the task's title" autoFocus={true} autocapitalize='sentences' autoCorrect="on"></IonInput>
 
