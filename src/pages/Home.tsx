@@ -1,9 +1,9 @@
-import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from '@ionic/react';
+import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from '@ionic/react';
 import './Home.css';
 import React, { useEffect, useState } from 'react';
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
-import { closeSharp, ellipsisVerticalSharp, helpCircleSharp, informationCircleSharp, settingsSharp } from 'ionicons/icons';
+import { addSharp, closeSharp, ellipsisVerticalSharp, helpCircleSharp, informationCircleSharp, settingsSharp } from 'ionicons/icons';
 import ReloadPrompt from '../components/ReloadPrompt';
 import { App, AppInfo } from '@capacitor/app';
 import { Preferences } from '@capacitor/preferences';
@@ -303,6 +303,11 @@ const Home: React.FC = () => {
           }}
         ></IonActionSheet>
         <ReloadPrompt />
+        <IonFab slot='fixed' vertical='bottom' horizontal='end'>
+          <IonFabButton routerLink="/add-task">
+            <IonIcon icon={addSharp}></IonIcon>
+          </IonFabButton>
+        </IonFab>
       </IonContent>
     </IonPage>
   );
