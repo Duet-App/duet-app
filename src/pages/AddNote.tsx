@@ -47,7 +47,7 @@ const AddNote: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot='start'>
-            <IonBackButton></IonBackButton>
+            <IonBackButton defaultHref="/"></IonBackButton>
           </IonButtons>
           <IonTitle>Add Note</IonTitle>
         </IonToolbar>

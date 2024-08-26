@@ -77,7 +77,7 @@ const AddTask: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot='start'>
-            <IonBackButton></IonBackButton>
+            <IonBackButton defaultHref="/"></IonBackButton>
           </IonButtons>
           <IonTitle>Add Task</IonTitle>
         </IonToolbar>

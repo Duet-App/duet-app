@@ -55,7 +55,7 @@ const AddProjectTask: React.FC<AddProjectTaskPageProps> = ({match}) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot='start'>
-            <IonBackButton></IonBackButton>
+            <IonBackButton defaultHref="/"></IonBackButton>
           </IonButtons>
           <IonTitle>Add Task</IonTitle>
         </IonToolbar>

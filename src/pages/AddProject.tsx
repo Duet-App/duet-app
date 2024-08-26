@@ -45,7 +45,7 @@ const AddProject: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot='start'>
-            <IonBackButton></IonBackButton>
+            <IonBackButton defaultHref="/"></IonBackButton>
           </IonButtons>
           <IonTitle>Add Project</IonTitle>
         </IonToolbar>
