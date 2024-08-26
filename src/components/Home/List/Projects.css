@@ -1,0 +1,9 @@
+.project-progress {
+  width: 28px;
+  height: 28px;
+  background: conic-gradient(#3880ff calc(3.6deg * var(--duet-project-progress)), transparent 0) content-box;
+  border-radius: 50%;
+  margin-right: 16px;
+  border: 2px solid #3880ff;
+  padding: 2px;
+}
