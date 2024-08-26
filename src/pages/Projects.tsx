@@ -1,4 +1,4 @@
-import { IonBackButton, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonPage, IonRow, IonSpinner, IonText, IonTitle, IonToolbar, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonRow, IonSpinner, IonText, IonTitle, IonToolbar, useIonViewDidEnter } from "@ionic/react"
 import { add, ellipsisVerticalCircleOutline, ellipsisVerticalOutline, ellipsisVerticalSharp } from "ionicons/icons"
 import './Projects.css'
 import PouchDB from "pouchdb"
@@ -96,33 +96,29 @@ const ProjectsPage: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Projects</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
-        {
-          projects.length > 0
-          ? projects.map((project, index) => {
-            return (
-              <IonItem key={project._id} routerLink={"/project/details/" + project._id} lines={index == projects.length - 1 ? "none" : "inset"}>
-                <div
-                  style={
-                    {
-                      '--duet-project-progress': (project.tasks ? ( projectsProgress.find(p => p.key == project._id).value.complete / projectsProgress.find(p => p.key == project._id).value.total * 100 ) : 0)
+        <IonList>
+          {
+            projects.length > 0
+            ? projects.map((project, index) => {
+              return (
+                <IonItem key={project._id} routerLink={"/project/details/" + project._id} lines={index == projects.length - 1 ? "none" : "inset"}>
+                  <div
+                    style={
+                      {
+                        '--duet-project-progress': (project.tasks ? ( projectsProgress.find(p => p.key == project._id).value.complete / projectsProgress.find(p => p.key == project._id).value.total * 100 ) : 0)
+                      }
                     }
-                  }
-                  className="project-progress"
-                ></div>
-                <IonLabel>{project.title}</IonLabel>
-              </IonItem>
-            )
-          })
-          : <div className="ion-padding">
-            <IonText color="medium">No projects found! Create a new project by pressing the + button below.</IonText>
-          </div>
-        }
+                    className="project-progress"
+                  ></div>
+                  <IonLabel>{project.title}</IonLabel>
+                </IonItem>
+              )
+            })
+            : <div className="ion-padding">
+              <IonText color="medium">No projects found! Create a new project by pressing the + button below.</IonText>
+            </div>
+          }
+        </IonList>
 
         <IonFab slot='fixed' vertical='bottom' horizontal='end'>
           <IonFabButton routerLink="/project/add">
