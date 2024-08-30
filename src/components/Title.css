@@ -10,4 +10,5 @@ textarea.title-editor-input {
   line-height: 1.2;
   resize: none;
   caret-color: var(--ion-color-primary);
+  background: var(--ion-color-background);
 }
