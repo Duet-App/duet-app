@@ -8,7 +8,7 @@ const Title = ({ title, update } : {title: string, update: (title: string) => vo
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    setContent(title ?? "")
+    setContent(title)
   }, [])
 
   useEffect(() => {
