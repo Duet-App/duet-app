@@ -7,6 +7,7 @@ import { IonCheckboxCustomEvent, IonDatetimeCustomEvent, IonSelectCustomEvent, O
 import './TaskDetails.css'
 import { archiveOutline, arrowBackSharp, arrowForwardSharp, checkmark, checkmarkCircle, checkmarkSharp, close, closeCircle, closeOutline, closeSharp, ellipsisVerticalSharp, pricetagsOutline, toggle, trashSharp } from 'ionicons/icons'
 import Markdown from 'react-markdown'
+import Title from '../components/Title/Title'
 
 interface TaskDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -164,12 +165,12 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
     }
   }
 
-  const updateTaskTitle = async () => {
+  const updateTaskTitle = async (title: string) => {
     const timestamp = new Date().toISOString()
     
     const response = await db.put({
       ...task,
-      title: editedTitle,
+      title: title,
       timestamps: {
         ...task.timestamps,
         updated: timestamp,
@@ -401,7 +402,8 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       </IonHeader>
       <IonContent fullscreen>
         <div className='ion-padding'>
-          <h3 id='openTitleEditModal'>{task.title}</h3>
+          {/* <h3 id='openTitleEditModal'>{task.title}</h3> */}
+          <Title title={task.title} update={updateTaskTitle} />
           <div id='open-modal' style={{color: task.description ? 'initial' : 'var(--ion-color-medium)'}}>
             <Markdown>
               {task.description ? task.description : 'Tap to set a description'}
