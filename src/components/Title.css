@@ -1,0 +1,13 @@
+textarea.title-editor-input {
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  font-size: 1.375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  resize: none;
+  caret-color: var(--ion-color-primary);
+}

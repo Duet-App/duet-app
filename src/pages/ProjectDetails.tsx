@@ -8,6 +8,7 @@ import { add, checkmark, checkmarkSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
+import Title from "../components/Title"
 
 interface ProjectDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -122,7 +123,8 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
       </IonHeader>
       <IonContent fullscreen>
         <div style={{padding: '16px 16px 0'}}>
-          <h3>{project.title}</h3>
+          {/* <h3>{project.title}</h3> */}
+          <Title title={project.title} update={updateProjectTitle} />
           {
             !projectDescEditing
             ? <div
