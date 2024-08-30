@@ -8,13 +8,13 @@ const Title = ({ title, update } : {title: string, update: (title: string) => vo
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    setContent(title)
+    setContent(title ?? "")
   }, [])
 
   useEffect(() => {
     if(isEditing) {
       inputRef.current?.focus()
-      inputRef.current!.selectionStart = content ? content.length : title.length;
+      inputRef.current!.selectionStart = content ? content.length : (title ? title.length : 0);
     }
   }, [isEditing])
 
@@ -61,8 +61,14 @@ const Title = ({ title, update } : {title: string, update: (title: string) => vo
           onBlur={(e) => {
             setIsEditing(false)
           }}
-        >{title}</textarea>
-        : <h3 style={{marginTop: 0}} onClick={() => {setIsEditing(true)}}>{title}</h3>
+        >{title ?? ""}</textarea>
+        : <>
+          {
+            title
+            ? <h3 style={{marginTop: 0}} onClick={() => {setIsEditing(true)}}>{title}</h3>
+            : <h3 style={{marginTop: 0, color: 'var(--ion-color-medium)'}} onClick={() => {setIsEditing(true)}}>Tap to set title</h3>
+          }
+       </>
       }
     </>
   )
