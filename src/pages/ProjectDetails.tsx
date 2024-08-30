@@ -8,7 +8,7 @@ import { add, checkmark, checkmarkSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
-import Title from "../components/Title"
+import Title from "../components/Title/Title"
 
 interface ProjectDetailsPageProps extends RouteComponentProps<{
   id: string
