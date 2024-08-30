@@ -46,3 +46,27 @@ ion-header.ion-no-border {
 ion-header.ion-no-border ion-toolbar {
   --background: var(--ion-background-color, var(--ion-background-color, #fff));
 }
+
+ul {
+  padding-left: 24px;
+}
+
+blockquote {
+  margin: 12px 0 12px 12px;
+  padding: 0 0 0 12px;
+  position: relative;
+  box-sizing: border-box;
+  color: var(--ion-color-medium-shade);
+}
+
+blockquote::before {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  content: "";
+  display: inline-block;
+  height: 110%;
+  width: 2px;
+  background: var(--ion-color-primary);
+}
