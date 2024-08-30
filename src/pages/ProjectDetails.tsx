@@ -75,6 +75,23 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
     }
   }
 
+  const updateProjectTitle = async (title: string) => {
+    const timestamp = new Date().toISOString()
+    
+    const response = await db.put({
+      ...project,
+      title: title,
+      timestamps: {
+        ...project.timestamps,
+        updated: timestamp,
+      }
+    })
+    if(response.ok) {
+      const newProject = await db.get(project._id, {latest: true})
+      setProject(newProject)
+    }
+  }
+
   const updateProjectDescription = async () => {
     const timestamp = new Date().toISOString()
     
