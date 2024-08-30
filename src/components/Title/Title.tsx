@@ -43,9 +43,9 @@ const Title = ({ title, update } : {title: string, update: (title: string) => vo
             }
           }}
           onKeyDown={(e) => {
-            if (e.code == 'Escape') {
+            if (e.key == 'Escape') {
               inputRef.current?.blur()
-            } else if (e.code == 'Enter') {
+            } else if (e.key == 'Enter') {
               update(content)
               inputRef.current?.blur()
             }
