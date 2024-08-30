@@ -8,6 +8,7 @@ import './TaskDetails.css'
 import { archiveOutline, arrowBackSharp, arrowForwardSharp, checkmark, checkmarkCircle, checkmarkSharp, close, closeCircle, closeOutline, closeSharp, ellipsisVerticalSharp, pricetagsOutline, toggle, trashSharp } from 'ionicons/icons'
 import Markdown from 'react-markdown'
 import Title from '../components/Title/Title'
+import Description from '../components/Title/Description'
 
 interface TaskDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -148,12 +149,12 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
     }
   }
 
-  const updateTaskDescription = async () => {
+  const updateTaskDescription = async (description: string) => {
     const timestamp = new Date().toISOString()
     
     const response = await db.put({
       ...task,
-      description: editedDescription,
+      description: description,
       timestamps: {
         ...task.timestamps,
         updated: timestamp,
@@ -404,11 +405,12 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
         <div className='ion-padding'>
           {/* <h3 id='openTitleEditModal'>{task.title}</h3> */}
           <Title title={task.title} update={updateTaskTitle} />
-          <div id='open-modal' style={{color: task.description ? 'initial' : 'var(--ion-color-medium)'}}>
+          {/* <div id='open-modal' style={{color: task.description ? 'initial' : 'var(--ion-color-medium)'}}>
             <Markdown>
               {task.description ? task.description : 'Tap to set a description'}
             </Markdown>
-          </div>
+          </div> */}
+          <Description description={task.description} update={updateTaskDescription} />
         </div>
 
         {/* <small style={{marginBottom: 12, marginTop: 24, display: 'block', color: 'var(--ion-color-medium)'}}>Subtasks</small> */}
