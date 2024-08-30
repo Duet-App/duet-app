@@ -26,6 +26,8 @@ const Title = ({ title, update } : {title: string, update: (title: string) => vo
           ref={inputRef}
           className="title-editor-input"
           value={content}
+          // @ts-expect-error: ignore next line for now
+          enterkeyhint="done"
           onChange={(e) => {
             setContent(e.target.value)
             if(e.target.value.length < content.length) {
