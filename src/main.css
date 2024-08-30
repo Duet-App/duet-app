@@ -30,6 +30,7 @@ ion-modal.statusPickerModal ion-list {
 
 hr {
   background: var(--ion-color-medium);
+  margin: 26.4px 0;
 }
 
 ion-header.ion-no-border {
