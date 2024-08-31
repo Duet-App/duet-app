@@ -421,7 +421,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
             {
               subtasks.map(subtask => {
                 return <IonItem>
-                  <IonCheckbox legacy={true} className='ion-text-wrap' labelPlacement="end" justify="start" onIonChange={(e) => toggleSubtask(e, subtask)} checked={subtask.complete}>{subtask.title}</IonCheckbox> 
+                  <IonCheckbox legacy={true} labelPlacement="end" justify="start" onIonChange={(e) => toggleSubtask(e, subtask)} checked={subtask.complete}>{subtask.title}</IonCheckbox> 
                 </IonItem>
               })
             }

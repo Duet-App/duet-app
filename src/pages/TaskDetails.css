@@ -29,3 +29,7 @@ ion-modal.smallEditModal .wrapper {
 ion-modal.smallEditModal .wrapper ion-textarea {
     /* --highlight-color-focused: transparent; */
 }
+
+ion-checkbox::part(label) {
+    white-space: initial;
+}
