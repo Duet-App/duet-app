@@ -98,7 +98,7 @@ const AddNote: React.FC = () => {
         />
 
         <IonFab slot='fixed' vertical='bottom' horizontal='end'>
-          <IonFabButton onClick={addNote} routerLink="/add-task">
+          <IonFabButton onClick={addNote}>
             <IonIcon icon={checkmark}></IonIcon>
           </IonFabButton>
         </IonFab>
