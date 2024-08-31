@@ -29,6 +29,11 @@ const Today: React.FC = () => {
             },
           },
           {
+            "scheduled_date": {
+              "$ne": null
+            }
+          },
+          {
             status: "Next",
           }
         ],
@@ -46,10 +51,21 @@ const Today: React.FC = () => {
     const result = await db.find({
       selector: {
         type: "task",
-        status: "Next",
-        "scheduled_date": {
-          "$lt": formatISO(startOfToday())
-        },
+        "$and": [
+          {
+            "scheduled_date": {
+              "$lt": formatISO(startOfToday())
+            },
+          },
+          {
+            "scheduled_date": {
+              "$ne": null
+            }
+          },
+          {
+            "status": "Next"
+          }
+        ]
       },
       sort: [{'scheduled_date': 'asc'}]
     })
