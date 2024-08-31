@@ -15,7 +15,7 @@ const HomeListUI = () => {
           <IonIcon slot="start" style={{color: '#F9A825'}} icon={starSharp} />
           <IonLabel>Today</IonLabel>
         </IonItem>
-        <IonItem button>
+        <IonItem button routerLink="/actionable">
           <IonIcon slot="start" style={{color: '#689F38'}} icon={checkmarkCircleSharp} />
           <IonLabel>Actionable</IonLabel>
         </IonItem>

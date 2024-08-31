@@ -51,6 +51,7 @@ import AddNote from './pages/AddNote';
 import NoteDetails from './pages/NoteDetails';
 import SettingsPage from './pages/SettingsPage';
 import ReloadPrompt from './components/ReloadPrompt';
+import Actionable from './pages/Actionable';
 
 setupIonicReact({
   mode: 'md'
@@ -85,6 +86,9 @@ const App: React.FC = () => (
         </Route>
         <Route exact path="/today">
           <Today />
+        </Route>
+        <Route exact path="/actionable">
+          <Actionable />
         </Route>
         <Route exact path="/upcoming">
           <Upcoming />
