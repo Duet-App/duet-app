@@ -8,6 +8,7 @@ import './Editor.css'
 import { BlockTypeSelect, BoldItalicUnderlineToggles, InsertThematicBreak, ListsToggle, MDXEditor, MDXEditorMethods, UndoRedo, headingsPlugin, listsPlugin, markdownShortcutPlugin, thematicBreakPlugin, toolbarPlugin } from '@mdxeditor/editor'
 import '@mdxeditor/editor/style.css'
 import { DuetEditor } from "../components/DuetEditor"
+import NoteTitle from "../components/NoteTitle/NoteTitle"
 
 const AddNote: React.FC = () => {
 
@@ -54,36 +55,9 @@ const AddNote: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen>
 
-        <IonInput fill="solid" ref={input} value={title} onIonInput={(e: IonInputCustomEvent<InputInputEventDetail>) => setTitle(e.detail.value || '')} label="Note title" labelPlacement="floating" placeholder="Enter the note's title" autoFocus={true} autocapitalize='sentences' autoCorrect="on" style={{marginBottom: '12px'}}></IonInput>
+        {/* <IonInput fill="solid" ref={input} value={title} onIonInput={(e: IonInputCustomEvent<InputInputEventDetail>) => setTitle(e.detail.value || '')} label="Note title" labelPlacement="floating" placeholder="Enter the note's title" autoFocus={true} autocapitalize='sentences' autoCorrect="on" style={{marginBottom: '12px'}}></IonInput> */}
 
-        {/* <IonTextarea value={description} onIonInput={(e: TextareaCustomEvent<TextareaChangeEventDetail>) => setDescription(e.detail.value || '')} fill="solid" autoGrow={true} label="Description" labelPlacement="floating" placeholder="Enter a description" style={{marginTop: '16px'}}></IonTextarea> */}
-
-        {/* <MDXEditor
-          ref={descEditor}
-          markdown={description}
-          onChange={setDescription}
-          placeholder="Note"
-          plugins={
-            [
-              toolbarPlugin({
-                toolbarContents: () => (
-                  <>
-                    {' '}
-                    <UndoRedo />
-                    <BlockTypeSelect />
-                    <BoldItalicUnderlineToggles />
-                    <ListsToggle />
-                    <InsertThematicBreak />
-                  </>
-                )
-              }),
-              headingsPlugin(),
-              listsPlugin(),
-              thematicBreakPlugin(),
-              markdownShortcutPlugin()
-            ]
-          } 
-        /> */}
+        <NoteTitle title={title} update={(value) => {setTitle(value)}} />
 
         <DuetEditor
           markdownContent={description}
