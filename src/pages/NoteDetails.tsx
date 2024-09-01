@@ -7,6 +7,7 @@ import { RouteComponentProps } from "react-router"
 import { arrowForwardSharp, checkmark, checkmarkSharp, close, closeSharp, ellipsisVerticalSharp, folderSharp, trashSharp } from "ionicons/icons"
 import { OverlayEventDetail } from "@ionic/core"
 import { DuetEditor } from "../components/DuetEditor"
+import NoteTitle from "../components/NoteTitle/NoteTitle"
 
 interface NoteDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -69,12 +70,13 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
   //   }
   // }, [])
 
-  const updateNoteTitle = async () => {
+  const updateNoteTitle = async (title: string) => {
+    setNote({...note, title: title})
     const timestamp = new Date().toISOString()
     
     const response = await db.put({
       ...note,
-      title: editedTitle,
+      title: title,
       timestamps: {
         ...note.timestamps,
         updated: timestamp,
@@ -180,9 +182,9 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen className="ion-padding">
-        <h3 id="openTitleEditModal">{note.title}</h3>
-        <div id="openDescriptionEditModal">
+      <IonContent fullscreen>
+        <NoteTitle title={note.title} update={updateNoteTitle} />
+        <div id="openDescriptionEditModal" style={{padding: '0 16px', height: "100%"}}>
           <Markdown>
             {note.description}
           </Markdown>
@@ -260,6 +262,9 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
                   padding: '16px',
                   fontFamily: 'var(--ion-font-family)'
                 },
+                "&.cm-editor": {
+                  backgroundColor: "#121212"
+                }
               }}
             />
 
