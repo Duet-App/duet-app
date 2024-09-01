@@ -362,7 +362,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   if(!loaded) {
     return (
       <IonPage>
-        <IonHeader>
+        <IonHeader className='ion-no-border'>
           <IonToolbar>
             <IonButtons slot='start'>
               <IonBackButton defaultHref='/'></IonBackButton>
