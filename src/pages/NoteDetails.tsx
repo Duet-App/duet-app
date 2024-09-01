@@ -6,13 +6,6 @@ import PouchFind from 'pouchdb-find'
 import { RouteComponentProps } from "react-router"
 import { arrowForwardSharp, checkmark, checkmarkSharp, close, closeSharp, ellipsisVerticalSharp, folderSharp, trashSharp } from "ionicons/icons"
 import { OverlayEventDetail } from "@ionic/core"
-import { BlockTypeSelect, BoldItalicUnderlineToggles, InsertThematicBreak, ListsToggle, MDXEditor, MDXEditorMethods, UndoRedo, headingsPlugin, listsPlugin, markdownShortcutPlugin, thematicBreakPlugin, toolbarPlugin } from '@mdxeditor/editor'
-// import '@mdxeditor/editor/style.css'
-// import { Controlled as CodeMirror } from "react-codemirror2";
-// import "codemirror/lib/codemirror.css";
-// import "codemirror/theme/material-darker.css"
-// import "codemirror/mode/markdown/markdown.js";
-// import '../duetCmEditor.css'
 import { DuetEditor } from "../components/DuetEditor"
 
 interface NoteDetailsPageProps extends RouteComponentProps<{
@@ -33,10 +26,8 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
   const [loaded, setLoaded] = useState(false)
   const [selectedProject, setSelectedProject] = useState("")
 
-  const titleEditModal = useRef<HTMLIonModalElement>(null)
   const descriptionEditModal = useRef<HTMLIonModalElement>(null)
   const projectPickerModal = useRef<HTMLIonModalElement>(null)
-  // const descEditor = useRef<MDXEditorMethods>(null)
   const descEditor = useRef()
   const descWrapper = useRef(null)
   const deleteNoteConfirmation = useRef<HTMLIonAlertElement>(null)
@@ -112,11 +103,6 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
     }
   }
 
-  const onChangeNoteDescription = useCallback((val, viewUpdate) => {
-    console.log('val:', val);
-    setEditedDescription(val);
-  }, []);
-
   const moveNoteToProject = async () => {
 
     const timestamp = new Date().toISOString()
@@ -152,12 +138,6 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
         })
       }
     })
-  }
-
-  function onWillDismissTitleEditModal(ev: CustomEvent<OverlayEventDetail>) {
-    if(ev.detail.role == 'update') {
-      updateNoteTitle()
-    }
   }
 
   function onWillDismissDescriptionEditModal(ev: CustomEvent<OverlayEventDetail>) {
@@ -244,36 +224,6 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
           }}
         ></IonActionSheet>
 
-        <IonModal ref={titleEditModal} trigger="openTitleEditModal" onWillDismiss={(ev) => onWillDismissTitleEditModal(ev)}>
-          <IonHeader className="ion-no-border">
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton onClick={() => titleEditModal.current?.dismiss(null, 'cancel')}>
-                  <IonIcon slot='icon-only' icon={close}></IonIcon>
-                </IonButton>
-              </IonButtons>
-              <IonButtons slot="end">
-                <IonButton onClick={() => titleEditModal.current?.dismiss(null, 'update')}>
-                  <IonIcon slot='icon-only' icon={checkmark}></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent className="ion-padding">
-            <IonTextarea
-              value={editedTitle}
-              onIonInput={(e: TextareaCustomEvent<TextareaChangeEventDetail>) => setEditedTitle(e.detail.value || '')}
-              fill="solid"
-              autofocus={true}
-              autoGrow={true}
-              label="Title"
-              labelPlacement="floating"
-              placeholder="Enter a title"
-              style={{marginTop: '16px'}}
-            >
-            </IonTextarea>
-          </IonContent>
-        </IonModal>
         <IonModal ref={descriptionEditModal} trigger="openDescriptionEditModal" onWillDismiss={(ev) => onWillDismissDescriptionEditModal(ev)} onDidPresent={
           (e) => {
             if(descEditor.current) {
