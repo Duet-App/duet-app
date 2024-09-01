@@ -16,9 +16,11 @@ const ProjectsPage: React.FC = () => {
       db.find({
         selector: {
           type: "project",
+          "timestamps.updated": {
+            "$gt": null
+          }
         },
-        // "use_index": ['inbox-items', 'inbox-items'],
-        // sort: [{'timestamps.created': 'asc'}, {'title': 'asc'}]
+        sort: [{'timestamps.updated': 'desc'}]
       })
       .then((result: object | null) => {
         if(result) {
