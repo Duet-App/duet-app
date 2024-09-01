@@ -61,8 +61,6 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
         selector: {
           type: "project",
         },
-        // "use_index": ['inbox-items', 'inbox-items'],
-        // sort: [{'timestamps.created': 'asc'}, {'title': 'asc'}]
       })
       .then((result: object | null) => {
         if(result) {
@@ -329,26 +327,6 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
     })
   }
 
-  function confirm() {
-    modal.current?.dismiss(null, 'confirm');
-  }
-
-  function confirmTitleEdit() {
-    titleEditModal.current?.dismiss(null, 'confirm')
-  }
-
-  function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
-    if (ev.detail.role === 'confirm') {
-      updateTaskDescription()
-    }
-  }
-
-  function onWillDismissTitleEditModal(ev: CustomEvent<OverlayEventDetail>) {
-    if (ev.detail.role === 'confirm') {
-      updateTaskTitle()
-    }
-  }
-
   function onWillDismissTagPickerModal(ev: CustomEvent<OverlayEventDetail>) {
     updateTaskTags()
   }
@@ -403,17 +381,10 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       </IonHeader>
       <IonContent fullscreen>
         <div className='ion-padding'>
-          {/* <h3 id='openTitleEditModal'>{task.title}</h3> */}
           <Title title={task.title} update={updateTaskTitle} />
-          {/* <div id='open-modal' style={{color: task.description ? 'initial' : 'var(--ion-color-medium)'}}>
-            <Markdown>
-              {task.description ? task.description : 'Tap to set a description'}
-            </Markdown>
-          </div> */}
           <Description description={task.description} update={updateTaskDescription} />
         </div>
 
-        {/* <small style={{marginBottom: 12, marginTop: 24, display: 'block', color: 'var(--ion-color-medium)'}}>Subtasks</small> */}
         {
           subtasks.length > 0
           ? <IonList>
@@ -442,14 +413,9 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
           ></IonInput>
         </div>
 
-        {/* <small style={{marginBottom: 12, marginTop: 24, display: 'block', color: 'var(--ion-color-medium)'}}>Meta</small> */}
         <IonList>
           <IonListHeader>Meta</IonListHeader>
           <IonItem lines='inset'>
-            {/* <IonLabel>
-              <p>Status</p>
-              <div>{task.status ?? 'Todo'}</div>
-            </IonLabel> */}
             <IonSelect value={status} onIonChange={e => {updateTaskStatus(e)}} label="Task status" labelPlacement="stacked">
               <IonSelectOption value="Todo">Todo</IonSelectOption>
               <IonSelectOption value="Next">Next</IonSelectOption>
@@ -557,106 +523,6 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
           </IonDatetime>
         </IonModal>
 
-        <IonModal className='smallEditModal' ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
-          {/* <IonHeader>
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton onClick={() => modal.current?.dismiss()}>
-                  <IonIcon slot='icon-only' icon={close}></IonIcon>
-                </IonButton>
-              </IonButtons>
-              <IonButtons slot="end">
-                <IonButton onClick={() => confirm()}>
-                  <IonIcon slot='icon-only' icon={checkmark}></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader> */}
-          <div className="wrapper">
-            <IonText color="medium">Edit description</IonText>
-            <IonTextarea
-              value={editedDescription}
-              onIonInput={(e: TextareaCustomEvent<TextareaChangeEventDetail>) => setEditedDescription(e.detail.value || '')}
-              fill="solid"
-              autofocus={true}
-              autoGrow={true}
-              // label="Description"
-              // labelPlacement="floating"
-              placeholder="Enter a description"
-              // style={{marginTop: '16px'}}
-              mode='ios'
-              autocapitalize='sentences'
-              autoCorrect='on'
-            >
-            </IonTextarea>
-          </div>
-          <IonFooter className='ion-align-self-end'>
-            <IonToolbar>
-              <IonButtons slot='start'>
-                <IonButton onClick={() => modal.current?.dismiss()}>
-                  <IonIcon slot='icon-only' color='medium' icon={closeOutline}></IonIcon>
-                </IonButton>
-              </IonButtons>
-              <IonButtons slot='end'>
-                <IonButton onClick={() => confirm()}>
-                  <IonIcon slot='icon-only' color='primary' icon={checkmarkCircle}></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonFooter>
-          {/* <IonContent className="ion-padding">
-          </IonContent> */}
-        </IonModal>
-        <IonModal className='smallEditModal' ref={titleEditModal} trigger="openTitleEditModal" onWillDismiss={(ev) => onWillDismissTitleEditModal(ev)}>
-          {/* <IonHeader>
-            <IonToolbar>
-              <IonButtons slot="start">
-                <IonButton onClick={() => titleEditModal.current?.dismiss()}>
-                  <IonIcon slot='icon-only' icon={close}></IonIcon>
-                </IonButton>
-              </IonButtons>
-              <IonButtons slot="end">
-                <IonButton onClick={() => confirmTitleEdit()}>
-                  <IonIcon slot='icon-only' icon={checkmark}></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonHeader> */}
-          {/* <IonContent className="ion-padding">
-          </IonContent> */}
-          <div className="wrapper">
-            <IonText color="medium">Edit title</IonText>
-            <IonTextarea
-              value={editedTitle}
-              onIonInput={(e: TextareaCustomEvent<TextareaChangeEventDetail>) => setEditedTitle(e.detail.value || '')}
-              // fill="solid"
-              autofocus={true}
-              autoGrow={true}
-              // label="Title"
-              // labelPlacement="floating"
-              placeholder="Enter a title"
-              // style={{marginTop: '16px'}}
-              mode='ios'
-              autocapitalize='sentences'
-              autoCorrect='on'
-            >
-            </IonTextarea>
-          </div>
-          <IonFooter className='ion-align-self-end'>
-            <IonToolbar>
-              <IonButtons slot='start'>
-                <IonButton onClick={() => titleEditModal.current?.dismiss()}>
-                  <IonIcon slot='icon-only' color='medium' icon={closeOutline}></IonIcon>
-                </IonButton>
-              </IonButtons>
-              <IonButtons slot='end'>
-                <IonButton onClick={() => confirmTitleEdit()}>
-                  <IonIcon slot='icon-only' color='primary' icon={checkmarkCircle}></IonIcon>
-                </IonButton>
-              </IonButtons>
-            </IonToolbar>
-          </IonFooter>
-        </IonModal>
         <IonModal
           ref={tagPickerModal}
           trigger="openTagPickerModal"
@@ -747,7 +613,6 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
         </IonModal>
         <IonAlert
           ref={deleteTaskConfirmation}
-          // trigger="task-delete-confirmation"
           header="Delete Task?"
           message="This will permanently remove the task. Do you wish to continue?"
           buttons={[
