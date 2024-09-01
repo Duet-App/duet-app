@@ -94,6 +94,9 @@ const AddNote: React.FC = () => {
               height: '80vh',
               fontFamily: 'var(--ion-font-family)'
             },
+            "&.cm-editor": {
+              backgroundColor: "#121212"
+            }
           }}
         />
 
