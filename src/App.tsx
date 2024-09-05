@@ -52,6 +52,7 @@ import NoteDetails from './pages/NoteDetails';
 import SettingsPage from './pages/SettingsPage';
 import ReloadPrompt from './components/ReloadPrompt';
 import Actionable from './pages/Actionable';
+import NotesFolderPage from './pages/NotesFolder';
 
 setupIonicReact({
   mode: 'md'
@@ -117,6 +118,7 @@ const App: React.FC = () => (
           <AddNote />
         </Route>
         <Route path="/notes/details/:id" component={NoteDetails} />
+        <Route path="/notes/folder/:path" component={NotesFolderPage} />
         <Route exact path="/logbook">
           <LogbookPage />
         </Route>

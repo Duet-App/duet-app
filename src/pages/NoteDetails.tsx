@@ -1,4 +1,4 @@
-import { IonActionSheet, IonAlert, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonModal, IonPage, IonRadio, IonRadioGroup, IonTextarea, IonToolbar, TextareaChangeEventDetail, TextareaCustomEvent, useIonRouter, useIonViewDidEnter } from "@ionic/react"
+import { IonActionSheet, IonAlert, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonModal, IonPage, IonRadio, IonRadioGroup, IonTextarea, IonToolbar, TextareaChangeEventDetail, TextareaCustomEvent, useIonRouter, useIonViewDidEnter } from "@ionic/react"
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react"
 import Markdown from "react-markdown"
 import PouchDB from 'pouchdb'
@@ -28,7 +28,9 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
   const [selectedProject, setSelectedProject] = useState("")
 
   const descriptionEditModal = useRef<HTMLIonModalElement>(null)
+  const moveToFolderModal = useRef<HTMLIonModalElement>(null)
   const projectPickerModal = useRef<HTMLIonModalElement>(null)
+  const folderPathInputRef = useRef<HTMLIonInputElement>(null)
   const descEditor = useRef()
   const descWrapper = useRef(null)
   const deleteNoteConfirmation = useRef<HTMLIonAlertElement>(null)
@@ -142,15 +144,53 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
     })
   }
 
+  const updateNotePath = async (path: string) => {
+    const timestamp = new Date().toISOString()
+
+    let constructedPath
+    let splitBySlashPath = path.split("/")
+    constructedPath = `,${splitBySlashPath.toString()},`
+    
+    const response = await db.put({
+      ...note,
+      path: constructedPath,
+      timestamps: {
+        ...note.timestamps,
+        updated: timestamp,
+      }
+    })
+    if(response.ok) {
+      const newNote = await db.get(note._id, {latest: true})
+      setNote(newNote)
+    }
+  }
+
   function onWillDismissDescriptionEditModal(ev: CustomEvent<OverlayEventDetail>) {
     if(ev.detail.role == 'update') {
       updateNoteDescription()
     }
   }
 
+  function onWillDismissMoveToFolderModal(ev: CustomEvent<OverlayEventDetail>) {
+    if(ev.detail.role == 'update') {
+      updateNotePath(folderPathInputRef.current?.value!.toString()!)
+    }
+  }
+
   function onWillDissmissProjectPickerModal(ev: CustomEvent<OverlayEventDetail>) {
     if(ev.detail.role == 'move') {
       moveNoteToProject()
+    }
+  }
+
+  function onWillPresentMoveToFolderModal(ev: CustomEvent<OverlayEventDetail>) {
+    if(note.path) {
+      let pathSplit = note.path.split(",")
+      pathSplit.splice(0, 1)
+      pathSplit.splice(pathSplit.length - 1, 2)
+      let fullPath = pathSplit.toString()
+      fullPath = fullPath.replaceAll(",", "/")
+      folderPathInputRef.current!.value! = fullPath
     }
   }
 
@@ -195,6 +235,13 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
           header='Note actions'
           buttons={[
             {
+              text: 'Organize',
+              icon: folderSharp,
+              data: {
+                action: 'move-to-folder'
+              }
+            },
+            {
               text: 'Move to project',
               icon: arrowForwardSharp,
               data: {
@@ -222,6 +269,8 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
               projectPickerModal.current?.present()
             } else if(detail.data?.action == 'delete-note') {
               deleteNoteConfirmation.current?.present()
+            } else if(detail.data?.action == 'move-to-folder') {
+              moveToFolderModal.current?.present()
             }
           }}
         ></IonActionSheet>
@@ -268,6 +317,25 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
               }}
             />
 
+          </IonContent>
+        </IonModal>
+        <IonModal ref={moveToFolderModal} onWillPresent={(ev) => onWillPresentMoveToFolderModal(ev)} onWillDismiss={(ev) => onWillDismissMoveToFolderModal(ev)}>
+          <IonHeader className="ion-no-border">
+            <IonToolbar>
+              <IonButtons slot="start">
+                <IonButton onClick={() => moveToFolderModal.current?.dismiss(null, 'cancel')}>
+                  <IonIcon slot='icon-only' icon={close}></IonIcon>
+                </IonButton>
+              </IonButtons>
+              <IonButtons slot="end">
+                <IonButton onClick={() => moveToFolderModal.current?.dismiss(null, 'update')}>
+                  <IonIcon slot='icon-only' icon={checkmarkSharp}></IonIcon>
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className="ion-padding">
+            <IonInput type="text" labelPlacement="stacked" ref={folderPathInputRef} label="Folder path" />
           </IonContent>
         </IonModal>
         <IonModal ref={projectPickerModal} onWillDismiss={(ev) => onWillDissmissProjectPickerModal(ev)} initialBreakpoint={0.35} breakpoints={[0, 0.35, 1]}>

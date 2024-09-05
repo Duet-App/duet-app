@@ -1,9 +1,10 @@
 import { IonAvatar, IonBackButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonText, IonTitle, IonToolbar, useIonViewDidEnter } from "@ionic/react"
-import { add, documentTextSharp } from "ionicons/icons"
+import { add, documentTextSharp, folderSharp } from "ionicons/icons"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import { useState } from "react"
 import NoteItem from "../components/Notes/NoteItem"
+import NoteFolderItem from "../components/Notes/NoteFolderItem"
 
 const NotesPage: React.FC = () => {
 
@@ -11,27 +12,65 @@ const NotesPage: React.FC = () => {
   PouchDB.plugin(PouchFind)
 
   const [notes, setNotes] = useState([])
+  const [folders, setFolders] = useState([])
 
   useIonViewDidEnter(() => {
-    function getNotes() {
-      db.find({
-        selector: {
-          type: "note",
-        },
-        // "use_index": ['inbox-items', 'inbox-items'],
-        // sort: [{'timestamps.created': 'asc'}, {'title': 'asc'}]
-      })
-      .then((result: object | null) => {
-        if(result) {
-          setNotes(result.docs)
-        }
-      }).catch((err: Error) => {
-        console.log(err)
-      })
-    }
-
     getNotes()
+    getFolderPaths()
   })
+
+  function getNotes() {
+    db.find({
+      selector: {
+        type: "note",
+        "timestamps.updated": {
+          "$gt": null
+        },
+        "$or": [
+          {
+            "path": null
+          },
+          {
+            "path": {
+              "$exists": false
+            }
+          }
+        ],
+        "project_id": {
+          "$exists": false
+        }
+      },
+      sort: [{'timestamps.updated': 'desc'}]
+    })
+    .then((result: object | null) => {
+      if(result) {
+        setNotes(result.docs)
+      }
+    }).catch((err: Error) => {
+      console.log(err)
+    })
+  }
+
+  function getFolderPaths() {
+    db.find({
+      selector: {
+        "type": "note",
+        "path": {
+          "$exists": true
+        }
+      }
+    }).then(result => {
+      let data = result.docs!
+      let root =  []
+      data.forEach(doc => {
+        let folder = doc.path.match(/,(.*?),/)
+        if(!root.includes(folder[1])) {
+          root.push(folder[1])
+        }
+      })
+      setFolders(root)
+    })
+  }
 
   return (
     <IonPage>
@@ -45,16 +84,25 @@ const NotesPage: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen>
         {
+          folders.length > 0
+          ? <IonList>
+            {
+              folders.map((folder) => {
+                return (
+                  <NoteFolderItem key={folder} folder={{full: folder, current: folder}} />
+                )
+              })
+            }
+          </IonList>
+          : null
+        }
+        {
           notes.length > 0
           ?  <IonList>
             {
               notes.map(note => {
                 return (
                   <NoteItem key={note._id} note={note} />
-                  // <IonItem routerLink={"/notes/details/" + note._id}>
-                  //   <IonIcon slot="start" icon={documentTextSharp}></IonIcon>
-                  //   <IonLabel>{note.title}</IonLabel>
-                  // </IonItem>
                 )
               })
             }
