@@ -25,7 +25,7 @@ export const DuetEditor = ({ markdownContent, onChange, style } : { markdownCont
         onUpdate,
         EditorView.lineWrapping,
         EditorView.baseTheme(style!),
-        placeholder('Note'),
+        placeholder('Type out your note here'),
         EditorView.contentAttributes.of({
           autocorrect: "on",
           spellcheck: "true",
