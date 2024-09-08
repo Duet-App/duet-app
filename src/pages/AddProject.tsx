@@ -55,12 +55,15 @@ const AddProject: React.FC = () => {
         <IonInput fill="solid" ref={input} value={title} onIonInput={(e: IonInputCustomEvent<InputInputEventDetail>) => setTitle(e.detail.value || '')} label="Task title" labelPlacement="floating" placeholder="Enter the task's title" autoFocus={true} autocapitalize='sentences' autoCorrect="on"></IonInput>
 
         <IonTextarea value={description} onIonInput={(e: TextareaCustomEvent<TextareaChangeEventDetail>) => setDescription(e.detail.value || '')} fill="solid" autocapitalize='sentences' autoCorrect="on" autoGrow={true} label="Description" labelPlacement="floating" placeholder="Enter a description" style={{marginTop: '16px'}}></IonTextarea>
-
-        <IonFab slot='fixed' vertical='bottom' horizontal='end'>
-          <IonFabButton onClick={addProject} routerLink="/add-task">
-            <IonIcon icon={checkmark}></IonIcon>
-          </IonFabButton>
-        </IonFab>
+    
+        {
+          title.length > 0 &&
+          <IonFab slot='fixed' vertical='bottom' horizontal='end'>
+            <IonFabButton onClick={addProject} routerLink="/add-task">
+              <IonIcon icon={checkmark}></IonIcon>
+            </IonFabButton>
+          </IonFab>
+        }
       </IonContent>
     </IonPage>
   )

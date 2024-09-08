@@ -66,11 +66,14 @@ const AddProjectTask: React.FC<AddProjectTaskPageProps> = ({match}) => {
 
         <IonTextarea value={description} onIonInput={(e: TextareaCustomEvent<TextareaChangeEventDetail>) => setDescription(e.detail.value || '')} fill="solid" autoGrow={true} autocapitalize='sentences' autoCorrect="on" label="Description" labelPlacement="floating" placeholder="Enter a description" style={{marginTop: '16px'}}></IonTextarea>
 
-        <IonFab slot='fixed' vertical='bottom' horizontal='end'>
-          <IonFabButton onClick={addTask}>
-            <IonIcon icon={checkmark}></IonIcon>
-          </IonFabButton>
-        </IonFab>
+        {
+          title.length > 0 &&
+          <IonFab slot='fixed' vertical='bottom' horizontal='end'>
+            <IonFabButton onClick={addTask}>
+              <IonIcon icon={checkmark}></IonIcon>
+            </IonFabButton>
+          </IonFab>
+        }
       </IonContent>
     </IonPage>
   )

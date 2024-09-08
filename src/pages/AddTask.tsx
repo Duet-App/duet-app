@@ -124,11 +124,14 @@ const AddTask: React.FC = () => {
           </IonDatetime>
         </IonModal>
 
-        <IonFab slot='fixed' vertical='bottom' horizontal='end'>
-          <IonFabButton onClick={addTask}>
-            <IonIcon icon={checkmark}></IonIcon>
-          </IonFabButton>
-        </IonFab>
+        {
+          title.length > 0 &&
+          <IonFab slot='fixed' vertical='bottom' horizontal='end'>
+            <IonFabButton onClick={addTask}>
+              <IonIcon icon={checkmark}></IonIcon>
+            </IonFabButton>
+          </IonFab>
+        }
       </IonContent>
     </IonPage>
   )
