@@ -69,7 +69,7 @@ const AddNote: React.FC = () => {
               fontFamily: 'var(--ion-font-family)'
             },
             "&.cm-editor": {
-              backgroundColor: "#121212"
+              backgroundColor: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? "#121212" : "#ffffff"
             }
           }}
         />
