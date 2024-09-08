@@ -335,7 +335,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
             </IonToolbar>
           </IonHeader>
           <IonContent className="ion-padding">
-            <IonInput type="text" labelPlacement="stacked" ref={folderPathInputRef} label="Folder path" />
+            <IonInput type="text" labelPlacement="stacked" ref={folderPathInputRef} label="Folder path" autocapitalize='sentences' autoCorrect="on" placeholder="Projects/Project Name" />
           </IonContent>
         </IonModal>
         <IonModal ref={projectPickerModal} onWillDismiss={(ev) => onWillDissmissProjectPickerModal(ev)} initialBreakpoint={0.35} breakpoints={[0, 0.35, 1]}>
