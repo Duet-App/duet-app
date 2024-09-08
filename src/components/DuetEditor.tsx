@@ -5,7 +5,7 @@ import { minimalSetup } from "codemirror"
 import { EditorState } from "@codemirror/state"
 import { EditorView, placeholder } from '@codemirror/view'
 import { markdown } from "@codemirror/lang-markdown"
-import { oneDark } from "@codemirror/theme-one-dark"
+import { githubDark, githubLight } from "@uiw/codemirror-theme-github"
 
 export const DuetEditor = ({ markdownContent, onChange, style } : { markdownContent: string, onChange: (val: string) => void, style?: {} }) => {
 
@@ -20,7 +20,7 @@ export const DuetEditor = ({ markdownContent, onChange, style } : { markdownCont
       doc: markdownContent,
       extensions: [
         minimalSetup,
-        oneDark,
+        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? githubDark : githubLight,
         markdown(),
         onUpdate,
         EditorView.lineWrapping,
