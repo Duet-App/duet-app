@@ -1,4 +1,4 @@
-import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from '@ionic/react';
+import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
 import './Home.css';
 import React, { useEffect, useState } from 'react';
 import PouchDB from 'pouchdb'
@@ -227,6 +227,7 @@ const Home: React.FC = () => {
 
   const router = useIonRouter()
   const [homeUI, setHomeUI] = useState("list")
+  const [appInfo, setAppInfo] = useState<AppInfo>()
 
   document.addEventListener('ionBackButton', (ev) => {
     ev.detail.register(-1, () => {
@@ -236,13 +237,9 @@ const Home: React.FC = () => {
     });
   });
 
-  let appInfo: AppInfo
-  App.getInfo().then(value => {
-    appInfo = value
-  })
-
-  useIonViewDidEnter(() => {
+  useIonViewWillEnter(() => {
     async function getHomeUI() {
+      setAppInfo(await App.getInfo())
       const pref = await getHomeUIPref()
       if(pref == null) {
         await setHomeUIPref("list")
@@ -274,7 +271,7 @@ const Home: React.FC = () => {
         }
         <IonActionSheet
           trigger='openActionsSheet'
-          header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + 'pre-release' : 'Duet v0.9.805 pre-release'}
+          header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + ' pre-release' : 'Duet v0.9.805 pre-release'}
           buttons={[
             {
               text: 'Settings',
