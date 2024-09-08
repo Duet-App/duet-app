@@ -1,4 +1,4 @@
-import { CheckboxChangeEventDetail, DatetimeChangeEventDetail, SelectChangeEventDetail, TextareaChangeEventDetail, IonBackButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonLabel, IonList, IonModal, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, IonButton, IonInput, IonIcon, IonTextarea, IonChip, IonRow, IonText, IonItemOption, IonCheckbox, IonActionSheet, IonRadioGroup, IonRadio, IonGrid, IonCol, IonSpinner, IonFooter, IonAlert, useIonRouter, IonListHeader } from '@ionic/react'
+import { CheckboxChangeEventDetail, DatetimeChangeEventDetail, SelectChangeEventDetail, TextareaChangeEventDetail, IonBackButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonLabel, IonList, IonModal, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, IonButton, IonInput, IonIcon, IonTextarea, IonChip, IonRow, IonText, IonItemOption, IonCheckbox, IonActionSheet, IonRadioGroup, IonRadio, IonGrid, IonCol, IonSpinner, IonFooter, IonAlert, useIonRouter, IonListHeader, useIonViewDidEnter } from '@ionic/react'
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
 import { useEffect, useRef, useState } from 'react'
@@ -41,53 +41,53 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   const [selectedProject, setSelectedProject] = useState("")
   const [loaded, setLoaded] = useState(false)
 
-  useEffect(() => {
-    async function getTask() {
-      db.get(match.params.id, {latest: true}).then((doc) => {
-        setTask(doc)
-        setSubtasks(doc.subtasks ? doc.subtasks : [])
-        setEditedTitle(doc.title)
-        setEditedDescription(doc.description)
-        setStatus(doc.status)
-        setScheduledDate(doc.scheduled_date)
-        setDueDate(doc.due_date)
-        setTags(doc.tags ? doc.tags : [])
-        getProjects()
-      })
-    }
-
-    function getProjects() {
-      db.find({
-        selector: {
-          type: "project",
-        },
-      })
-      .then((result: object | null) => {
-        if(result) {
-          setProjects(result.docs)
-          getAllTags()
-          setLoaded(true)
-        }
-      }).catch((err: Error) => {
-        console.log(err)
-      })
-    }
-
-    async function getAllTags() {
-      const result = await db.query('tags-ddoc/all-tags', {
-        group: true
-      })
-      if(result.rows) {
-        const tags = []
-        result.rows.forEach(row => {
-          tags.push(row.key)
-        });
-        setAllTags(tags)
-      }
-    }
-
+  useIonViewDidEnter(() => {
     getTask()
-  }, [])
+  })
+
+  async function getTask() {
+    db.get(match.params.id, {latest: true}).then((doc) => {
+      setTask(doc)
+      setSubtasks(doc.subtasks ? doc.subtasks : [])
+      setEditedTitle(doc.title)
+      setEditedDescription(doc.description)
+      setStatus(doc.status)
+      setScheduledDate(doc.scheduled_date)
+      setDueDate(doc.due_date)
+      setTags(doc.tags ? doc.tags : [])
+      getProjects()
+    })
+  }
+
+  function getProjects() {
+    db.find({
+      selector: {
+        type: "project",
+      },
+    })
+    .then((result: object | null) => {
+      if(result) {
+        setProjects(result.docs)
+        getAllTags()
+        setLoaded(true)
+      }
+    }).catch((err: Error) => {
+      console.log(err)
+    })
+  }
+
+  async function getAllTags() {
+    const result = await db.query('tags-ddoc/all-tags', {
+      group: true
+    })
+    if(result.rows) {
+      const tags = []
+      result.rows.forEach(row => {
+        tags.push(row.key)
+      });
+      setAllTags(tags)
+    }
+  }
 
   const updateTaskScheduledDate = async (e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {
     setScheduledDate(e.detail.value || ''); 
