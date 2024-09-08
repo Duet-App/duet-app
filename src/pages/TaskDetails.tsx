@@ -89,6 +89,21 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
     }
   }
 
+  async function updateProjectTimestamps() {
+    const timestamp = new Date().toISOString()
+    if(task.project_id) {
+      db.get(task.project_id).then(project => {
+        db.put({
+          ...project,
+          timestamps: {
+            ...project.timestamps,
+            updated: timestamp
+          }
+        })
+      })
+    }
+  }
+
   const updateTaskScheduledDate = async (e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {
     setScheduledDate(e.detail.value || ''); 
     const timestamp = new Date().toISOString()
@@ -105,6 +120,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       const newTask = await db.get(task._id, {latest: true})
       setTask(newTask)
       setScheduledDate(newTask.scheduled_date)
+      updateProjectTimestamps()
     }
   }
 
@@ -124,6 +140,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       const newTask = await db.get(task._id, {latest: true})
       setTask(newTask)
       setDueDate(newTask.due_date)
+      updateProjectTimestamps()
     }
   }
 
@@ -144,6 +161,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       const newTask = await db.get(task._id, {latest: true})
       setTask(newTask)
       setStatus(newTask.status)
+      updateProjectTimestamps()
     }
   }
 
@@ -161,6 +179,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
     if(response.ok) {
       const newTask = await db.get(task._id, {latest: true})
       setTask(newTask)
+      updateProjectTimestamps()
     }
   }
 
@@ -178,6 +197,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
     if(response.ok) {
       const newTask = await db.get(task._id, {latest: true})
       setTask(newTask)
+      updateProjectTimestamps()
     }
   }
 
@@ -207,6 +227,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
         const newTask = await db.get(task._id, {latest: true})
         setTask(newTask)
         setSubtasks(newTask.subtasks)
+        updateProjectTimestamps()
       }
     }
   }
@@ -239,6 +260,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       const newTask = await db.get(task._id, {latest: true})
       setTask(newTask)
       setSubtasks(newTask.subtasks)
+      updateProjectTimestamps()
     }
   }
 
@@ -272,6 +294,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       setTask(newTask)
       setTags(newTask.tags)
       await getAllTags()
+      updateProjectTimestamps()
     }
   }
 
@@ -322,6 +345,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   const deleteTask = () => {
     db.remove(task).then(response => {
       if(response.ok) {
+        updateProjectTimestamps()
         router.goBack()
       }
     })
