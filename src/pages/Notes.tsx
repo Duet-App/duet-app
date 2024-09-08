@@ -13,10 +13,12 @@ const NotesPage: React.FC = () => {
 
   const [notes, setNotes] = useState([])
   const [folders, setFolders] = useState([])
+  const [projectSupportMaterial, setProjectSupportMaterial] = useState([])
 
   useIonViewDidEnter(() => {
     getNotes()
     getFolderPaths()
+    getProjectSupportMaterial()
   })
 
   function getNotes() {
@@ -72,6 +74,24 @@ const NotesPage: React.FC = () => {
     })
   }
 
+  function getProjectSupportMaterial() {
+    db.find({
+      selector: {
+        type: "note",
+        "project_id": {
+          "$exists": true
+        }
+      },
+    })
+    .then((result: object | null) => {
+      if(result) {
+        setProjectSupportMaterial(result.docs)
+      }
+    }).catch((err: Error) => {
+      console.log(err)
+    })
+  }
+
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
@@ -86,6 +106,11 @@ const NotesPage: React.FC = () => {
         {
           folders.length > 0
           ? <IonList>
+            {
+              projectSupportMaterial.length > 0
+              ? <NoteFolderItem key="Projects" folder={{full: "Projects", current: "Project Support Material"}} />
+              : null
+            }
             {
               folders.map((folder) => {
                 return (
