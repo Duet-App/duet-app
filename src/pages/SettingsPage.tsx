@@ -179,7 +179,7 @@ const SettingsPage: React.FC = () => {
       reader.onload = ({target: {result}}) => {
         db.bulkDocs(
           JSON.parse(result),
-          {new_edits: false}, // do not change revision
+          {new_edits: JSON.parse(result).find(r => r._rev) ? false : true}, // do not change revision
         ).then(response => {
           present({
             message: 'Successfully imported',
