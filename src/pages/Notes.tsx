@@ -132,9 +132,11 @@ const NotesPage: React.FC = () => {
               })
             }
           </IonList>
-          : <div className="ion-padding">
+          : !( projectSupportMaterial.length > 0 ) || !( folders.length > 0 )
+          ? <div className="ion-padding">
             <IonText color="medium">No notes found! Add a note by using the button below.</IonText>
           </div>
+          : null
         }
 
         <IonFab slot='fixed' vertical='bottom' horizontal='end'>
