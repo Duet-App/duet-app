@@ -104,7 +104,7 @@ const NotesPage: React.FC = () => {
       </IonHeader>
       <IonContent fullscreen>
         {
-          folders.length > 0
+          folders.length > 0 || projectSupportMaterial.length > 0
           ? <IonList>
             {
               projectSupportMaterial.length > 0
