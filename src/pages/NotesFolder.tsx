@@ -153,11 +153,13 @@ const NotesFolderPage: React.FC<NoteFolderPageProps> = ({match}) => {
                   current: projects.find(p => p._id == doc.project_id)?.title!,
                   full: `Projects,${doc.project_id}`
                 })
-              } else if(folders.find(f => f.full.split(",").at(1) != doc.project_id)) {
-                folders.push({
-                  current: projects.find(p => p._id == doc.project_id)?.title!,
-                  full: `Projects,${doc.project_id}`
-                })
+              } else {
+                if(!folders.find(f => f.full.split(",").at(1) == doc.project_id)) {
+                  folders.push({
+                    current: projects.find(p => p._id == doc.project_id)?.title!,
+                    full: `Projects,${doc.project_id}`
+                  })
+                }
               }
             })
           } else {
