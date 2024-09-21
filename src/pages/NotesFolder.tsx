@@ -138,7 +138,8 @@ const NotesFolderPage: React.FC<NoteFolderPageProps> = ({match}) => {
         "selector": {
           type: "note",
           project_id: {
-            "$exists": true
+            "$exists": true,
+            "$ne": ""
           }
         }
       }).then(result => {
