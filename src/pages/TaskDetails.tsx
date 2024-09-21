@@ -9,6 +9,7 @@ import { archiveOutline, arrowBackSharp, arrowForwardSharp, checkmark, checkmark
 import Markdown from 'react-markdown'
 import Title from '../components/Title/Title'
 import Description from '../components/Title/Description'
+import { formatDistance } from 'date-fns'
 
 interface TaskDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -486,15 +487,15 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
 
         <div style={{marginTop: 32, padding: '0 16px'}}>
           <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
-            Created: {task.timestamps ? new Date(task.timestamps.created).toLocaleString() : ''}
+            Created: {task.timestamps ? formatDistance(task.timestamps.created, Date.now()) + ' ago' : ''}
           </small>
           <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
-            Updated: {task.timestamps ? new Date(task.timestamps.updated).toLocaleString() : ''}
+            Updated: {task.timestamps ? formatDistance(task.timestamps.updated, Date.now()) + ' ago' : ''}
           </small>
           {
             (task.timestamps && task.timestamps.completed)
             ? <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
-              Completed: {(task.timestamps && task.timestamps.completed) ? new Date(task.timestamps.completed).toLocaleString() : ''}
+              Completed: {(task.timestamps && task.timestamps.completed) ? formatDistance(task.timestamps.completed, Date.now()) + ' ago' : ''}
             </small>
             : null
           }
