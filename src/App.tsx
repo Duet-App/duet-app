@@ -53,6 +53,7 @@ import SettingsPage from './pages/SettingsPage';
 import ReloadPrompt from './components/ReloadPrompt';
 import Actionable from './pages/Actionable';
 import NotesFolderPage from './pages/NotesFolder';
+import Waiting from './pages/Waiting';
 
 setupIonicReact({
   mode: 'md'
@@ -93,6 +94,9 @@ const App: React.FC = () => (
         </Route>
         <Route exact path="/upcoming">
           <Upcoming />
+        </Route>
+        <Route exact path="/waiting">
+          <Waiting />
         </Route>
         <Route exact path="/project">
           <ProjectsPage />

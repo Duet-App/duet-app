@@ -19,7 +19,7 @@ const HomeListUI = () => {
           <IonIcon slot="start" style={{color: '#689F38'}} icon={checkmarkCircleSharp} />
           <IonLabel>Actionable</IonLabel>
         </IonItem>
-        <IonItem button>
+        <IonItem button routerLink="/waiting">
           <IonIcon slot="start" color="medium" icon={pauseCircleSharp} />
           <IonLabel>Waiting for</IonLabel>
         </IonItem>

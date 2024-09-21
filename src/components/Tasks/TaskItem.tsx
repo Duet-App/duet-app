@@ -5,7 +5,7 @@ import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-com
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 
-const TaskItem: React.FC = (props) => {
+const TaskItem: React.FC<TaskItemProps> = (props) => {
 
   const db = new PouchDB('duet');
 
