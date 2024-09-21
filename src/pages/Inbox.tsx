@@ -51,6 +51,9 @@ const Inbox: React.FC = () => {
       selector: {
         type: "task",
         status: "Todo",
+        "timestamps.created": {
+          "$gt": null
+        },
         "$or": [
           {
             project_id: {
@@ -62,8 +65,7 @@ const Inbox: React.FC = () => {
           }
         ],
       },
-      // "use_index": ['inbox-items', 'inbox-items'],
-      // sort: [{'timestamps.created': 'asc'}, {'title': 'asc'}]
+      sort: [{'timestamps.created': 'asc'}]
     })
     .then((result: object | null) => {
       if(result) {
