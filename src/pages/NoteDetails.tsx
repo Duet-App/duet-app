@@ -231,7 +231,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
       </IonHeader>
       <IonContent fullscreen>
         <NoteTitle title={note.title} update={updateNoteTitle} />
-        <div id="openDescriptionEditModal" style={{padding: '0 16px 24px', height: "100%"}}>
+        <div id="openDescriptionEditModal" style={{padding: '0 16px 24px'}}>
           <Markdown>
             {note.description}
           </Markdown>
