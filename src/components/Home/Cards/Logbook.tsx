@@ -1,11 +1,18 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonRow, IonText } from "@ionic/react"
+import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonRow, IonText, isPlatform } from "@ionic/react"
 import { useEffect, useState } from "react"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 
 const LogbookCard: React.FC = () => {
 
-  const db = new PouchDB('duet');
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet');
+  }
   PouchDB.plugin(PouchFind)
 
   const [inboxTasksCount, setInboxTasksCount] = useState(0)

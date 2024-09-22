@@ -1,8 +1,9 @@
-import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonChip, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonModal, IonPage, IonRow, IonSkeletonText, IonSpinner, IonText, IonTitle, IonToolbar, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonChip, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonModal, IonPage, IonRow, IonSkeletonText, IonSpinner, IonText, IonTitle, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
 import { add, checkmark, filterOutline, pricetagsOutline } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { endOfToday, formatISO, startOfToday } from "date-fns";
 import { useHistory } from "react-router";
 import TaskItem from "../components/Tasks/TaskItem";
@@ -10,7 +11,13 @@ import TasksSkeletonLoader from "../components/TasksSkeletonLoader";
 
 const Today: React.FC = () => {
 
-  const db = new PouchDB('duet');
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet');
+  }
   PouchDB.plugin(PouchFind)
 
   async function getTodaysTasks() {

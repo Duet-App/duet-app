@@ -1,8 +1,9 @@
-import { IonActionSheet, IonAlert, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonModal, IonPage, IonRadio, IonRadioGroup, IonTextarea, IonToolbar, TextareaChangeEventDetail, TextareaCustomEvent, useIonRouter, useIonViewDidEnter } from "@ionic/react"
+import { IonActionSheet, IonAlert, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonModal, IonPage, IonRadio, IonRadioGroup, IonTextarea, IonToolbar, TextareaChangeEventDetail, TextareaCustomEvent, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
 import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react"
 import Markdown from "react-markdown"
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { RouteComponentProps } from "react-router"
 import { arrowForwardSharp, checkmark, checkmarkSharp, close, closeSharp, ellipsisVerticalSharp, folderSharp, trashSharp } from "ionicons/icons"
 import { OverlayEventDetail } from "@ionic/core"
@@ -15,7 +16,13 @@ interface NoteDetailsPageProps extends RouteComponentProps<{
 
 const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
 
-  const db = new PouchDB('duet')
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet')
+  }
   PouchDB.plugin(PouchFind)
 
   const router = useIonRouter()

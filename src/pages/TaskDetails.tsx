@@ -1,6 +1,7 @@
-import { CheckboxChangeEventDetail, DatetimeChangeEventDetail, SelectChangeEventDetail, TextareaChangeEventDetail, IonBackButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonLabel, IonList, IonModal, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, IonButton, IonInput, IonIcon, IonTextarea, IonChip, IonRow, IonText, IonItemOption, IonCheckbox, IonActionSheet, IonRadioGroup, IonRadio, IonGrid, IonCol, IonSpinner, IonFooter, IonAlert, useIonRouter, IonListHeader, useIonViewDidEnter } from '@ionic/react'
+import { CheckboxChangeEventDetail, DatetimeChangeEventDetail, SelectChangeEventDetail, TextareaChangeEventDetail, IonBackButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonLabel, IonList, IonModal, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, IonButton, IonInput, IonIcon, IonTextarea, IonChip, IonRow, IonText, IonItemOption, IonCheckbox, IonActionSheet, IonRadioGroup, IonRadio, IonGrid, IonCol, IonSpinner, IonFooter, IonAlert, useIonRouter, IonListHeader, useIonViewDidEnter, isPlatform } from '@ionic/react'
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
+import CordovaSqlite from 'pouchdb-adapter-cordova-sqlite'
 import { useEffect, useRef, useState } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { IonCheckboxCustomEvent, IonDatetimeCustomEvent, IonSelectCustomEvent, OverlayEventDetail, TextareaCustomEvent } from '@ionic/core'
@@ -17,7 +18,13 @@ interface TaskDetailsPageProps extends RouteComponentProps<{
 
 const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
 
-  const db = new PouchDB('duet')
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet')
+  }
   PouchDB.plugin(PouchFind)
 
   const router = useIonRouter()

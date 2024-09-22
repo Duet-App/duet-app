@@ -1,12 +1,19 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonRow, IonText, useIonViewDidEnter } from "@ionic/react"
+import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonRow, IonText, isPlatform, useIonViewDidEnter } from "@ionic/react"
 import { useEffect, useState } from "react"
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { endOfToday, format, formatISO, startOfToday } from "date-fns"
 
 const Today: React.FC = () => {
 
-  const db = new PouchDB('duet')
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet')
+  }
   PouchDB.plugin(PouchFind)
 
   const [todaysDate, setTodaysDate] = useState(String)

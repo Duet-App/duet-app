@@ -5,6 +5,7 @@ import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, I
 // import { AndroidSettings, NativeSettings } from "capacitor-native-settings"
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useRef, useState } from "react"
 import StorageAccessFramework from '../plugins/storage-access-framework/index.js';
 import { Preferences } from "@capacitor/preferences"
@@ -12,7 +13,13 @@ import { IonSelectCustomEvent } from "@ionic/core"
 
 const SettingsPage: React.FC = () => {
 
-  const db = new PouchDB('duet')
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet')
+  }
 
   const importModal = useRef<HTMLIonModalElement>(null)
 

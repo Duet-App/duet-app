@@ -1,7 +1,8 @@
-import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
 import { RouteComponentProps } from "react-router"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useEffect, useRef, useState } from "react"
 import { formatDistance } from "date-fns"
 import { add, checkmark, checkmarkSharp } from "ionicons/icons"
@@ -16,7 +17,13 @@ interface ProjectDetailsPageProps extends RouteComponentProps<{
 
 const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
 
-  const db = new PouchDB('duet')
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet')
+  }
   PouchDB.plugin(PouchFind)
 
   const [project, setProject] = useState({})

@@ -1,7 +1,8 @@
-import { IonAvatar, IonBackButton, IonBreadcrumb, IonBreadcrumbs, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonText, IonTitle, IonToolbar, useIonViewDidEnter } from "@ionic/react"
+import { IonAvatar, IonBackButton, IonBreadcrumb, IonBreadcrumbs, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonText, IonTitle, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
 import { add, documentTextSharp, folderSharp } from "ionicons/icons"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useState } from "react"
 import NoteItem from "../components/Notes/NoteItem"
 import { RouteComponentProps } from "react-router"
@@ -43,7 +44,13 @@ interface IDuetProject extends PouchDB.Core.ExistingDocument<{
 
 const NotesFolderPage: React.FC<NoteFolderPageProps> = ({match}) => {
 
-  const db = new PouchDB('duet');
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet');
+  }
   PouchDB.plugin(PouchFind)
 
   const path = match.params.path
