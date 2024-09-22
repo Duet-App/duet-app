@@ -21,7 +21,7 @@ const Inbox: React.FC = () => {
     getInboxTasks()
   })
 
-  const [inboxTasks, setInboxTasks] = useState([])
+  const [inboxTasks, setInboxTasks] = useState<Task[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
 
   function getInboxTasks() {
@@ -45,9 +45,9 @@ const Inbox: React.FC = () => {
       },
       sort: [{'timestamps.created': 'asc'}]
     })
-    .then((result: object | null) => {
+    .then((result) => {
       if(result) {
-        setInboxTasks(result.docs)
+        setInboxTasks(result.docs as Task[])
         setIsLoaded(true)
       }
     }).catch((err: Error) => {
