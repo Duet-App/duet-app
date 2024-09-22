@@ -10,8 +10,13 @@ import { BlockTypeSelect, BoldItalicUnderlineToggles, InsertThematicBreak, Lists
 import '@mdxeditor/editor/style.css'
 import { DuetEditor } from "../components/DuetEditor"
 import NoteTitle from "../components/NoteTitle/NoteTitle"
+import { RouteComponentProps } from "react-router"
 
-const AddNote: React.FC = () => {
+interface AddNotePageProps extends RouteComponentProps<{
+  id?: string
+}> {}
+
+const AddNote: React.FC<AddNotePageProps> = ({match}) => {
 
   let db: PouchDB.Database
   if(isPlatform('capacitor')) {
@@ -35,8 +40,9 @@ const AddNote: React.FC = () => {
 
   const addNote = () => {
     let date = new Date()
+    let noteId = crypto.randomUUID()
     let doc = {
-      "_id": crypto.randomUUID(),
+      "_id": noteId,
       "title": title,
       "description": description,
       "type": "note",
@@ -45,8 +51,33 @@ const AddNote: React.FC = () => {
         updated: date.toISOString(),
       }
     }
+    if(match.params.id) {
+      let newDoc = {
+        ...doc,
+        project_id: match.params.id
+      }
+      doc = newDoc
+    }
     db.put(doc).then(() => {
     })
+    if(match.params.id) {
+      db.get(match.params.id).then(result => {
+        let notes
+        if(result.notes) {
+          notes = [...result.notes, noteId]
+        } else {
+          notes = [noteId]
+        }
+        db.put({
+          ...result,
+          notes: notes,
+          timestamps: {
+            ...result.timestamps,
+            updated: date.toISOString()
+          }
+        }).then(() => {})
+      })
+    }
     router.goBack()
   }
 

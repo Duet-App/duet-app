@@ -118,9 +118,8 @@ const App: React.FC = () => (
         <Route exact path="/notes">
           <NotesPage />
         </Route>
-        <Route exact path="/notes/add">
-          <AddNote />
-        </Route>
+        <Route exact path="/notes/add" component={AddNote} />
+        <Route exact path="/notes/add/:id" component={AddNote} />
         <Route path="/notes/details/:id" component={NoteDetails} />
         <Route path="/notes/folder/:path" component={NotesFolderPage} />
         <Route exact path="/logbook">

@@ -1,11 +1,11 @@
-import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
 import { RouteComponentProps } from "react-router"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useEffect, useRef, useState } from "react"
 import { formatDistance } from "date-fns"
-import { add, checkmark, checkmarkSharp, chevronDownSharp } from "ionicons/icons"
+import { add, checkmark, checkmarkSharp, chevronDownSharp, documentTextSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
@@ -236,9 +236,17 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
         </div>
 
         <IonFab slot='fixed' vertical='bottom' horizontal='end'>
-          <IonFabButton routerLink={"/project/add-task/" + match.params.id}>
+          <IonFabButton>
             <IonIcon icon={add}></IonIcon>
           </IonFabButton>
+          <IonFabList side="top">
+            <IonFabButton routerLink={"/project/add-task/" + match.params.id}>
+              <IonIcon icon={checkmarkSharp}></IonIcon>
+            </IonFabButton>
+            <IonFabButton routerLink={"/notes/add/" + match.params.id}>
+              <IonIcon icon={documentTextSharp}></IonIcon>
+            </IonFabButton>
+          </IonFabList>
         </IonFab>
       </IonContent>
     </IonPage>
