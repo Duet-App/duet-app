@@ -1,10 +1,10 @@
-import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonToast, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
+import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonFabList, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonToast, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
 import './Home.css';
 import React, { useEffect, useState } from 'react';
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
 import CordovaSqlite from 'pouchdb-adapter-cordova-sqlite'
-import { addSharp, closeSharp, ellipsisVerticalSharp, helpCircleSharp, informationCircleSharp, settingsSharp } from 'ionicons/icons';
+import { addSharp, closeSharp, documentTextSharp, ellipsisVerticalSharp, fileTraySharp, helpCircleSharp, informationCircleSharp, settingsSharp } from 'ionicons/icons';
 import ReloadPrompt from '../components/ReloadPrompt';
 import { App, AppInfo } from '@capacitor/app';
 import { Preferences } from '@capacitor/preferences';
@@ -359,9 +359,17 @@ const Home: React.FC = () => {
         ></IonActionSheet>
         <ReloadPrompt />
         <IonFab slot='fixed' vertical='bottom' horizontal='end'>
-          <IonFabButton routerLink="/add-task">
+          <IonFabButton>
             <IonIcon icon={addSharp}></IonIcon>
           </IonFabButton>
+          <IonFabList side='top'>
+            <IonFabButton routerLink="/add-task">
+              <IonIcon icon={fileTraySharp}></IonIcon>
+            </IonFabButton>
+            <IonFabButton routerLink="/notes/add">
+              <IonIcon icon={documentTextSharp}></IonIcon>
+            </IonFabButton>
+          </IonFabList>
         </IonFab>
       </IonContent>
     </IonPage>
