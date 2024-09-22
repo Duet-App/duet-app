@@ -5,7 +5,7 @@ import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useEffect, useRef, useState } from "react"
 import { formatDistance } from "date-fns"
-import { add, checkmark, checkmarkSharp } from "ionicons/icons"
+import { add, checkmark, checkmarkSharp, chevronDownSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
@@ -30,6 +30,7 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
   const [projectTasks, setProjectTasks] = useState([])
   const [projectNotes, setProjectNotes] = useState([])
   const [completedProjectTasks, setCompletedProjectTasks] = useState([])
+  const [showCompleted, setShowCompleted] = useState(false)
 
   const [description, setDescription] = useState("")
 
@@ -119,6 +120,10 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
     }
   }
 
+  const toggleCompletedTaskView = () => {
+    setShowCompleted(showCompleted ? false : true)
+  }
+
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
@@ -180,22 +185,18 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
         {
           completedProjectTasks.length > 0
           ? <IonList style={{marginTop: 24}}>
-            <IonListHeader>Completed</IonListHeader>
+            <IonListHeader>
+              <IonLabel>Completed</IonLabel>
+              <IonButton size="small" onClick={toggleCompletedTaskView}>{ showCompleted ? "Hide" : "Show" }</IonButton>
+            </IonListHeader>
             {
-              completedProjectTasks.map(task => {
+              showCompleted
+              ? completedProjectTasks.map(task => {
                 return (
                   <TaskItem key={task._id} task={task} updateFn={getProject} />
-                  // <IonItem key={task._id} routerLink={"/tasks/" + task._id}>
-                  //   <IonCheckbox checked={true} slot="start"></IonCheckbox>
-                  //   <IonLabel
-                  //     style={{textDecoration: (task.status == "Done" || task.status == "Cancelled") ? 'line-through' : 'none'}}
-                  //     color={(task.status == "Done" || task.status == "Cancelled") ? 'medium' : 'initial'}
-                  //   >
-                  //     {task.title}
-                  //   </IonLabel>
-                  // </IonItem>
                 )
               })
+              : null
             }
           </IonList>
           : null
@@ -204,7 +205,7 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
         {
           projectNotes.length > 0
           ? <>
-          <IonList style={{marginTop: 24}}>
+          <IonList style={{marginTop: showCompleted ? 24 : 8}}>
             <IonListHeader>Project Support Material</IonListHeader>
             {
               projectNotes.map(note => {
