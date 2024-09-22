@@ -7,7 +7,7 @@ android {
         applicationId "xyz.aharish.duet.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 807
+        versionCode 808
         versionName "0.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

@@ -329,7 +329,7 @@ const Home: React.FC = () => {
         }
         <IonActionSheet
           trigger='openActionsSheet'
-          header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + ' pre-release' : 'Duet v0.9.807 pre-release'}
+          header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + ' pre-release' : 'Duet v0.9.808 pre-release'}
           buttons={[
             {
               text: 'Settings',
