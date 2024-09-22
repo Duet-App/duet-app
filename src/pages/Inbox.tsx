@@ -17,28 +17,6 @@ const Inbox: React.FC = () => {
   const router = useIonRouter()
   const statusPickerModal = useRef<HTMLIonModalElement>(null)
 
-  // useEffect(() => {
-  //   function getInboxTasks() {
-  //     db.find({
-  //       selector: {
-  //         type: "task",
-  //         status: "Todo",
-  //       },
-  //       // "use_index": ['inbox-items', 'inbox-items'],
-  //       // sort: [{'timestamps.created': 'asc'}, {'title': 'asc'}]
-  //     })
-  //     .then((result: object | null) => {
-  //       if(result) {
-  //         setInboxTasks(result.docs)
-  //       }
-  //     }).catch((err: Error) => {
-  //       console.log(err)
-  //     })
-  //   }
-
-  //   getInboxTasks()
-  // }, [])
-
   useIonViewDidEnter(() => {
     getInboxTasks()
   })
@@ -77,53 +55,6 @@ const Inbox: React.FC = () => {
     })
   }
 
-  // if(!isLoaded) {
-  //   return (
-  //     // <TasksSkeletonLoader title="Inbox"></TasksSkeletonLoader>
-  //     // <IonPage>
-  //     //   <IonHeader>
-  //     //     <IonToolbar>
-  //     //       <IonButtons slot='start'>
-  //     //         <IonBackButton defaultHref="/"></IonBackButton>
-  //     //       </IonButtons>
-  //     //       <IonTitle>Inbox</IonTitle>
-  //     //     </IonToolbar>
-  //     //   </IonHeader>
-  //     //   <IonContent fullscreen>
-  //     //     <IonList>
-  //     //       <IonItem>
-  //     //         <div slot="start">
-  //     //           <IonSkeletonText animated={true} style={{width: 24, height: 24, borderRadius: '50%'}}></IonSkeletonText>
-  //     //         </div>
-  //     //         <IonLabel>
-  //     //           <IonSkeletonText animated={true}></IonSkeletonText>
-  //     //           <IonSkeletonText animated={true} style={{width: '20%'}}></IonSkeletonText>
-  //     //         </IonLabel>
-  //     //       </IonItem>
-  //     //       <IonItem>
-  //     //         <div slot="start">
-  //     //           <IonSkeletonText animated={true} style={{width: 24, height: 24, borderRadius: '50%'}}></IonSkeletonText>
-  //     //         </div>
-  //     //         <IonLabel>
-  //     //           <IonSkeletonText animated={true}></IonSkeletonText>
-  //     //           <IonSkeletonText animated={true} style={{width: '20%'}}></IonSkeletonText>
-  //     //         </IonLabel>
-  //     //       </IonItem>
-  //     //       <IonItem lines="none">
-  //     //         <div slot="start">
-  //     //           <IonSkeletonText animated={true} style={{width: 24, height: 24, borderRadius: '50%'}}></IonSkeletonText>
-  //     //         </div>
-  //     //         <IonLabel>
-  //     //           <IonSkeletonText animated={true}></IonSkeletonText>
-  //     //           <IonSkeletonText animated={true} style={{width: '20%'}}></IonSkeletonText>
-  //     //         </IonLabel>
-  //     //       </IonItem>
-  //     //     </IonList>
-  //     //   </IonContent>
-  //     // </IonPage>
-  //   )
-  // }
-
   return (
     <IonPage>
       <IonHeader className="ion-no-border">
@@ -135,11 +66,6 @@ const Inbox: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        {/* <IonHeader collapse='condense'>
-          <IonToolbar>
-            <IonTitle size='large'>Inbox</IonTitle>
-          </IonToolbar>
-        </IonHeader> */}
         {
           !isLoaded
           ? <TasksSkeletonLoader />
@@ -164,32 +90,6 @@ const Inbox: React.FC = () => {
           </IonFabButton>
         </IonFab>
 
-        {/* <IonModal ref={statusPickerModal} className="statusPickerModal">
-          <h4 style={{padding: '12px 16px 6px'}}>Change status</h4>
-          <IonList>
-            <IonItem lines="none" button detail={false}>
-              <IonIcon color="medium" icon={ellipseOutline} slot="start"></IonIcon>
-              <IonLabel>Todo</IonLabel>
-            </IonItem>
-            <IonItem lines="none" button detail={false}>
-              <IonIcon color="primary" icon={chevronForwardCircle} slot="start"></IonIcon>
-              <IonLabel>Next</IonLabel>
-            </IonItem>
-            <IonItem lines="none" button detail={false}>
-              <IonIcon color="medium" icon={pauseCircle} slot="start"></IonIcon>
-              <IonLabel>Waiting</IonLabel>
-            </IonItem>
-            <IonItem lines="none" button detail={false}>
-              <IonIcon color="success" icon={checkmarkCircle} slot="start"></IonIcon>
-              <IonLabel>Done</IonLabel>
-            </IonItem>
-            <IonItem lines="none" button detail={false}>
-              <IonIcon color="medium" icon={closeCircle} slot="start"></IonIcon>
-              <IonLabel>Cancelled</IonLabel>
-            </IonItem>
-          </IonList>
-          <div style={{padding: 8}}></div>
-        </IonModal> */}
       </IonContent>
     </IonPage>
   )
