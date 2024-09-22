@@ -1,14 +1,21 @@
-import { IonBackButton, IonButtons, IonCheckbox, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonRow, IonText, IonTitle, IonToolbar, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonButtons, IonCheckbox, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonRow, IonText, IonTitle, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
 import { add } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { endOfToday, formatISO, startOfToday } from "date-fns";
 import TaskItem from "../components/Tasks/TaskItem";
 
 const Upcoming: React.FC = () => {
 
-  const db = new PouchDB('duet');
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet');
+  }
   PouchDB.plugin(PouchFind)
 
   useIonViewDidEnter(() => {

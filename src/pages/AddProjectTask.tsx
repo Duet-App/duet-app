@@ -1,9 +1,10 @@
-import { TextareaCustomEvent, InputInputEventDetail, DatetimeChangeEventDetail, IonBackButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonInput, IonPage, IonTextarea, IonTitle, IonToolbar, useIonRouter, useIonViewDidEnter, IonDatetimeButton, IonModal, IonDatetime, IonItem, IonLabel, IonSelect, IonSelectOption } from "@ionic/react"
+import { TextareaCustomEvent, InputInputEventDetail, DatetimeChangeEventDetail, IonBackButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonInput, IonPage, IonTextarea, IonTitle, IonToolbar, useIonRouter, useIonViewDidEnter, IonDatetimeButton, IonModal, IonDatetime, IonItem, IonLabel, IonSelect, IonSelectOption, isPlatform } from "@ionic/react"
 import { add, checkmark } from "ionicons/icons"
 import { useRef, useState } from "react"
 import type { IonInputCustomEvent, TextareaChangeEventDetail, IonDatetimeCustomEvent } from '@ionic/core'
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { RouteComponentProps, useHistory } from "react-router"
 
 interface AddProjectTaskPageProps extends RouteComponentProps<{
@@ -12,8 +13,15 @@ interface AddProjectTaskPageProps extends RouteComponentProps<{
 
 const AddProjectTask: React.FC<AddProjectTaskPageProps> = ({match}) => {
 
-  const db = new PouchDB('duet');
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    PouchDB.plugin(CordovaSqlite)
+    db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+  } else {
+    db = new PouchDB('duet');
+  }
   PouchDB.plugin(PouchFind)
+
   const router = useIonRouter()
   const history = useHistory()
 

@@ -1,13 +1,24 @@
-import { IonCol, IonGrid, IonItem, IonLabel, IonRow, IonSpinner, IonText, useIonViewDidEnter } from "@ionic/react"
+import { IonCol, IonGrid, IonItem, IonLabel, IonRow, IonSpinner, IonText, isPlatform, useIonViewDidEnter } from "@ionic/react"
 import './Projects.css'
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useState } from "react"
 
 const ProjectsTile: React.FC = () => {
 
-  const db = new PouchDB('duet');
+  let db: PouchDB.Database
+
+  if(isPlatform('capacitor')) {
+    document.addEventListener('deviceready', async function () {
+      PouchDB.plugin(CordovaSqlite)
+      db = new PouchDB('duet', {adapter: "cordova-sqlite"});
+    })
+  } else {
+    db = new PouchDB('duet');
+  }
   PouchDB.plugin(PouchFind)
+
 
   useIonViewDidEnter(() => {
     getProjects()

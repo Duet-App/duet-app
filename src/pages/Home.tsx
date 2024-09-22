@@ -1,8 +1,9 @@
-import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
+import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonToast, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
 import './Home.css';
 import React, { useEffect, useState } from 'react';
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
+import CordovaSqlite from 'pouchdb-adapter-cordova-sqlite'
 import { addSharp, closeSharp, ellipsisVerticalSharp, helpCircleSharp, informationCircleSharp, settingsSharp } from 'ionicons/icons';
 import ReloadPrompt from '../components/ReloadPrompt';
 import { App, AppInfo } from '@capacitor/app';
@@ -11,6 +12,8 @@ import HomeCardsUI from '../components/Home/CardsUI';
 import HomeListUI from '../components/Home/ListUI';
 
 const Home: React.FC = () => {
+
+  const [present] = useIonToast();
 
   const getHomeUIPref = async () => {
     const { value } = await Preferences.get({ key: 'homeUI' })
@@ -23,40 +26,98 @@ const Home: React.FC = () => {
       value: homeUISetting
     })
   }
+  
+  const getDbMigratedToSqlitePref = async () => {
+    const { value } = await Preferences.get({ key: 'dbMigratedToSqlite' })
+    return value
+  }
 
-  const db = new PouchDB('duet')
+  const setDbMigratedToSqlitePref = async (dbMigratedToSqlite: boolean) => {
+    await Preferences.set({
+      key: 'dbMigratedToSqlite',
+      value: String(dbMigratedToSqlite)
+    })
+  }
+
+  let db: PouchDB.Database
+
+  if(isPlatform('capacitor')) {
+    document.addEventListener('deviceready', async function () {
+      PouchDB.plugin(CordovaSqlite)
+
+      db = new PouchDB('duet', {adapter: 'cordova-sqlite'})
+      let isDbMigrated: string|null = await getDbMigratedToSqlitePref()
+      if(isDbMigrated == null) {
+        await setDbMigratedToSqlitePref(false)
+        isDbMigrated = await getDbMigratedToSqlitePref()
+      }
+
+      if(isDbMigrated == "false") {
+        const indexedDbDb = new PouchDB('duet')
+
+        indexedDbDb.replicate.to(db).then(async (result) => {
+          if(result.ok) {
+            present({
+              message: "Migrated DB",
+              duration: 1500,
+              position: 'bottom'
+            })
+            await setDbMigratedToSqlitePref(true)
+          }
+        }).catch(e => {
+          console.log("Failed to migrate DB", e)
+          present({
+            message: "Failed to migrate DB",
+            duration: 5000,
+            position: 'bottom'
+          })
+        })
+      }
+    })
+  } else {
+    db = new PouchDB('duet')
+  }
   PouchDB.plugin(PouchFind)
-  db.createIndex({
-    index: {
-      fields: ['timestamps.created']
-    }
-  })
-  db.createIndex({
-    index: {
-      fields: ['scheduled_date']
-    }
-  })
-  db.createIndex({
-    index: {
-      fields: ['status', 'type', 'project_id']
-    }
-  })
-  db.createIndex({
-    index: {
-      fields: ['status', 'type', 'scheduled_date']
-    }
-  })
-  db.createIndex({
-    index: {
-      fields: ['type']
-    }
-  })
-  db.createIndex({
-    index: {
-      fields: ['timestamps.updated'],
-      type: 'json'
-    }
-  })
+
+  const setupIndexes = async () => {
+    await db.createIndex({
+      index: {
+        fields: ['timestamps.created']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['scheduled_date']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['status', 'type', 'project_id']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['status', 'type', 'scheduled_date']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['type']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['timestamps.updated'],
+        type: 'json'
+      }
+    })
+    await setupTagsDDoc()
+    await setupProjectsDDoc()
+    await setupProjectsProgressDDoc()
+    await setupProjectsNotesDDoc()
+  }
+
+  setupIndexes()
 
   const tags_ddoc = {
     "_id": "_design/tags-ddoc",
@@ -220,22 +281,19 @@ const Home: React.FC = () => {
     }
   }
 
-  setupTagsDDoc()
-  setupProjectsDDoc()
-  setupProjectsProgressDDoc()
-  setupProjectsNotesDDoc()
-
   const router = useIonRouter()
   const [homeUI, setHomeUI] = useState("list")
   const [appInfo, setAppInfo] = useState<AppInfo>()
 
-  document.addEventListener('ionBackButton', (ev) => {
-    ev.detail.register(-1, () => {
-      if (!router.canGoBack()) {
-        App.exitApp();
-      }
+  if(isPlatform('android')) {
+    document.addEventListener('ionBackButton', (ev) => {
+      ev.detail.register(-1, () => {
+        if (!router.canGoBack()) {
+          App.exitApp();
+        }
+      });
     });
-  });
+  }
 
   useIonViewWillEnter(() => {
     async function getHomeUI() {

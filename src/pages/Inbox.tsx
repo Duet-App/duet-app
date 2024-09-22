@@ -1,8 +1,9 @@
-import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonModal, IonPage, IonRippleEffect, IonRow, IonSkeletonText, IonSpinner, IonText, IonTitle, IonToolbar, useIonModal, useIonRouter, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonModal, IonPage, IonRippleEffect, IonRow, IonSkeletonText, IonSpinner, IonText, IonTitle, IonToolbar, isPlatform, useIonModal, useIonRouter, useIonViewDidEnter } from "@ionic/react"
 import { add, checkmarkCircle, chevronForwardCircle, closeCircle, closeCircleOutline, ellipseOutline, pauseCircle } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 
 import '../taskList.css'
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
@@ -11,7 +12,16 @@ import TasksSkeletonLoader from "../components/TasksSkeletonLoader";
 
 const Inbox: React.FC = () => {
 
-  const db = new PouchDB('duet');
+  let db: PouchDB.Database
+
+  if(isPlatform('capacitor')) {
+    document.addEventListener('deviceready', () => {
+      PouchDB.plugin(CordovaSqlite)
+      db = new PouchDB('duet', {adapter: "cordova-sqlite"});
+    })
+  } else {
+    db = new PouchDB('duet');
+  }
   PouchDB.plugin(PouchFind)
 
   const router = useIonRouter()
