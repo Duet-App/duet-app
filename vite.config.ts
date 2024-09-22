@@ -19,6 +19,9 @@ export default defineConfig({
       includeAssets: ['**/*']
     })
   ],
+  define: {
+    global: {}
+  },
   test: {
     globals: true,
     environment: 'jsdom',
