@@ -10,6 +10,7 @@ import { App, AppInfo } from '@capacitor/app';
 import { Preferences } from '@capacitor/preferences';
 import HomeCardsUI from '../components/Home/CardsUI';
 import HomeListUI from '../components/Home/ListUI';
+import "./fab.css"
 
 const Home: React.FC = () => {
 
@@ -369,10 +370,10 @@ const Home: React.FC = () => {
             <IonIcon icon={addSharp}></IonIcon>
           </IonFabButton>
           <IonFabList side='top'>
-            <IonFabButton routerLink="/add-task">
+            <IonFabButton routerLink="/add-task" data-title="Add to Inbox">
               <IonIcon icon={fileTraySharp}></IonIcon>
             </IonFabButton>
-            <IonFabButton routerLink="/notes/add">
+            <IonFabButton routerLink="/notes/add" data-title="Add note">
               <IonIcon icon={documentTextSharp}></IonIcon>
             </IonFabButton>
           </IonFabList>

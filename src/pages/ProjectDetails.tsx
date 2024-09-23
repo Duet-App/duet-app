@@ -10,6 +10,7 @@ import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
 import Title from "../components/Title/Title"
+import "./fab.css"
 
 interface ProjectDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -246,10 +247,10 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
             <IonIcon icon={add}></IonIcon>
           </IonFabButton>
           <IonFabList side="top">
-            <IonFabButton routerLink={"/project/add-task/" + match.params.id}>
+            <IonFabButton routerLink={"/project/add-task/" + match.params.id} data-title="Add task">
               <IonIcon icon={checkmarkSharp}></IonIcon>
             </IonFabButton>
-            <IonFabButton routerLink={"/notes/add/" + match.params.id}>
+            <IonFabButton routerLink={"/notes/add/" + match.params.id} data-title="Add note">
               <IonIcon icon={documentTextSharp}></IonIcon>
             </IonFabButton>
           </IonFabList>
