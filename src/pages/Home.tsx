@@ -1,6 +1,6 @@
-import { IonActionSheet, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonFabList, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonToast, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
+import { IonActionSheet, IonBackdrop, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonFabList, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonToast, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
 import './Home.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
 import CordovaSqlite from 'pouchdb-adapter-cordova-sqlite'
@@ -284,6 +284,8 @@ const Home: React.FC = () => {
   const router = useIonRouter()
   const [homeUI, setHomeUI] = useState("list")
   const [appInfo, setAppInfo] = useState<AppInfo>()
+  const fabRef = useRef<HTMLIonFabElement>(null)
+  const [overlayVisible, setOverlayVisible] = useState(false)
 
   if(isPlatform('android')) {
     document.addEventListener('ionBackButton', (ev) => {
@@ -311,6 +313,10 @@ const Home: React.FC = () => {
 
   return (
     <IonPage>
+      <IonBackdrop
+        visible={overlayVisible}
+        style={{opacity: 0.15, zIndex: overlayVisible ? 11 : -1, transition: 'opacity,background 0.25s ease-in-out'}}
+      ></IonBackdrop>
       <IonHeader className='ion-no-border'>
         <IonToolbar>
           <IonTitle>Duet</IonTitle>
@@ -358,7 +364,7 @@ const Home: React.FC = () => {
           }}
         ></IonActionSheet>
         <ReloadPrompt />
-        <IonFab slot='fixed' vertical='bottom' horizontal='end'>
+        <IonFab ref={fabRef} onClick={() => {fabRef.current?.activated ? setOverlayVisible(true) : setOverlayVisible(false)}} slot='fixed' vertical='bottom' horizontal='end'>
           <IonFabButton>
             <IonIcon icon={addSharp}></IonIcon>
           </IonFabButton>

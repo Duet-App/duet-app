@@ -1,4 +1,4 @@
-import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonBackdrop, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
 import { RouteComponentProps } from "react-router"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
@@ -31,6 +31,8 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
   const [projectNotes, setProjectNotes] = useState([])
   const [completedProjectTasks, setCompletedProjectTasks] = useState([])
   const [showCompleted, setShowCompleted] = useState(false)
+  const [overlayVisible, setOverlayVisible] = useState(false)
+  const fabRef = useRef<HTMLIonFabElement>(null)
 
   const [description, setDescription] = useState("")
 
@@ -126,6 +128,10 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
 
   return (
     <IonPage>
+      <IonBackdrop
+        visible={overlayVisible}
+        style={{opacity: 0.15, zIndex: overlayVisible ? 11 : -1, transition: 'opacity,background 0.25s ease-in-out'}}
+      ></IonBackdrop>
       <IonHeader className="ion-no-border">
         <IonToolbar>
           <IonButtons slot='start'>
@@ -235,7 +241,7 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
           }
         </div>
 
-        <IonFab slot='fixed' vertical='bottom' horizontal='end'>
+        <IonFab ref={fabRef} onClick={() => {fabRef.current?.activated ? setOverlayVisible(true) : setOverlayVisible(false)}} slot='fixed' vertical='bottom' horizontal='end'>
           <IonFabButton>
             <IonIcon icon={add}></IonIcon>
           </IonFabButton>
