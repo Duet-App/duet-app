@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import './Title.css'
+import { Keyboard } from "@capacitor/keyboard"
 
 const Title = ({ title, update } : {title: string, update: (title: string) => void}) => {
 
@@ -9,6 +10,12 @@ const Title = ({ title, update } : {title: string, update: (title: string) => vo
 
   useEffect(() => {
     setContent(title)
+
+    Keyboard.addListener('keyboardWillHide', () => {
+      if(document.activeElement === inputRef.current!) {
+        inputRef.current!.blur()
+      }
+    })
   }, [])
 
   useEffect(() => {
@@ -61,6 +68,7 @@ const Title = ({ title, update } : {title: string, update: (title: string) => vo
             }
           }}
           onBlur={(e) => {
+            update(content)
             setIsEditing(false)
           }}
         >{title ?? ""}</textarea>
