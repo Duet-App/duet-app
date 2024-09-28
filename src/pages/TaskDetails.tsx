@@ -174,6 +174,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   }
 
   const updateTaskDescription = async (description: string) => {
+    setTask({...task, description: description})
     const timestamp = new Date().toISOString()
     
     const response = await db.put({
@@ -192,6 +193,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   }
 
   const updateTaskTitle = async (title: string) => {
+    setTask({...task, title: title})
     const timestamp = new Date().toISOString()
     
     const response = await db.put({
