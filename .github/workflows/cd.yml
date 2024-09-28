@@ -3,7 +3,7 @@ name: Build Android App, and Create Release
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+ [a-zA-Z]*"
+      - "v[0-9]+.[0-9]+.[0-9]+-?[a-zA-Z]*"
 
 jobs:
   build_android:
