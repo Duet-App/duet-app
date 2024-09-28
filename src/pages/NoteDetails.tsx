@@ -44,6 +44,9 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
   const [descEditorState, setDescEditorState] = useState()
 
   useIonViewDidEnter(() => {
+    if ("virtualKeyboard" in navigator && isPlatform('mobile') && isPlatform('pwa') && isPlatform('android')) {
+      navigator.virtualKeyboard.overlaysContent = true
+    }
     function getNoteDetails() {
       db.get(match.params.id).then((noteResponse: object) => {
         setNote(noteResponse)
@@ -316,7 +319,8 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
                   overflow: 'auto',
                   minHeight: 'calc(100vh - 88px)',
                   padding: '16px',
-                  fontFamily: 'var(--ion-font-family)'
+                  fontFamily: 'var(--ion-font-family)',
+                  paddingBottom: `calc(env(keyboard-inset-height, 16) + 16px)`
                 },
                 "&.cm-editor": {
                   backgroundColor: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? "#121212" : "#ffffff"
