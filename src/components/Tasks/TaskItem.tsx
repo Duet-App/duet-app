@@ -1,13 +1,22 @@
-import { IonIcon, IonItem, IonLabel, IonRippleEffect, useIonModal, useIonRouter } from "@ionic/react";
+import { IonIcon, IonItem, IonLabel, IonRippleEffect, isPlatform, useIonModal, useIonRouter } from "@ionic/react";
 import { checkmarkCircle, chevronForwardCircleOutline, ellipseOutline, pauseCircleOutline, removeCircle } from "ionicons/icons";
 import StatusPickerModal from "./StatusPickerModal";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
+import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 
 const TaskItem: React.FC<TaskItemProps> = (props) => {
 
-  const db = new PouchDB('duet');
+  let db: PouchDB.Database
+  if(isPlatform('capacitor')) {
+    document.addEventListener('deviceready', () => {
+      PouchDB.plugin(CordovaSqlite)
+      db = new PouchDB('duet', {adapter: "cordova-sqlite"});
+    })
+  } else {
+    db = new PouchDB('duet');
+  }
 
   const { task, updateFn, project } = props
 
