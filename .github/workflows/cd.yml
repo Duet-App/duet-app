@@ -1,0 +1,43 @@
+name: Build Android App, and Create Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+ [a-zA-Z]*"
+
+jobs:
+  build_android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build Android on Appflow
+        uses: ionic-team/appflow-build@v1
+        with:
+          token: ${{ secrets.APPFLOW_TOKEN }}
+          app-id: 34adbf20
+          platform: Android
+          build-type: release
+          certificate: duet-android-keystore
+          filename: Duet-Android-${{ github.ref_name }}
+          upload-artifact: Duet-Android-${{ github.ref_name }}-Build.zip
+
+  create_release:
+    needs: [build_android]
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Android Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Duet-Android-${{ github.ref_name }}-Build.zip
+          path: artifacts/android
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            artifacts/android/*
