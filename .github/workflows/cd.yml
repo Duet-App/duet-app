@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Download Android Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: Duet-Android-${{ github.ref_name }}-Build.zip
           path: artifacts/android
