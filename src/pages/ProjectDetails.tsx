@@ -1,11 +1,11 @@
-import { IonBackButton, IonBackdrop, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
+import { IonActionSheet, IonAlert, IonBackButton, IonBackdrop, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
 import { RouteComponentProps } from "react-router"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useEffect, useRef, useState } from "react"
 import { formatDistance } from "date-fns"
-import { add, checkmark, checkmarkSharp, chevronDownSharp, documentTextSharp } from "ionicons/icons"
+import { add, checkmark, checkmarkSharp, chevronDownSharp, closeSharp, documentTextSharp, ellipsisVerticalSharp, trashSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
@@ -39,6 +39,9 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
 
   const [projectDescEditing, setProjectDescEditing] = useState(false)
   const projectDescEditor = useRef<HTMLIonTextareaElement>(null)
+  const deleteProjectConfirmation = useRef<HTMLIonAlertElement>(null)
+
+  const router = useIonRouter()
 
   useIonViewDidEnter(() => {
     getProject()
@@ -128,6 +131,24 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
     setShowCompleted(showCompleted ? false : true)
   }
 
+  const deleteProject = async () => {
+    try {
+      const tasks = projectTasks?.map((task: object) => ({ ...task, _deleted: true }))
+      const notes = projectNotes?.map((note: object) => ({ ...note, _deleted: true }))
+      const result = await db.bulkDocs([
+        ...tasks,
+        ...notes,
+        {
+          ...project,
+          _deleted: true
+        }
+      ])
+      router.goBack()
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   return (
     <IonPage>
       <IonBackdrop
@@ -138,6 +159,11 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
         <IonToolbar>
           <IonButtons slot='start'>
             <IonBackButton defaultHref='/'></IonBackButton>
+          </IonButtons>
+          <IonButtons slot="end">
+            <IonButton id="openProjectActionsSheet">
+              <IonIcon slot="icon-only" icon={ellipsisVerticalSharp}></IonIcon>
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -256,6 +282,54 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
             </IonFabButton>
           </IonFabList>
         </IonFab>
+
+        <IonActionSheet
+          trigger='openProjectActionsSheet'
+          header='Project actions'
+          buttons={[
+            {
+              text: 'Delete',
+              icon: trashSharp,
+              role: 'destructive',
+              data: {
+                action: 'delete-project'
+              }
+            },
+            {
+              text: 'Cancel',
+              icon: closeSharp,
+              role: 'cancel',
+              data: {
+              }
+            }
+          ]}
+          onDidDismiss={({detail}) => {
+            if(detail.data?.action == 'delete-project') {
+              deleteProjectConfirmation.current?.present()
+            }
+          }}
+        ></IonActionSheet>
+        <IonAlert
+          ref={deleteProjectConfirmation}
+          // trigger="task-delete-confirmation"
+          header="Delete Project?"
+          message="This will permanently remove the Project, and all Tasks, and Notes associated with this Project. Do you wish to continue?"
+          buttons={[
+            {
+              text: 'Cancel',
+              role: 'cancel',
+            },
+            {
+              text: 'Delete',
+              role: 'destructive'
+            }
+          ]}
+          onDidDismiss={({detail}) => {
+            if(detail.role == 'destructive') {
+              deleteProject()
+            }
+          }}
+        ></IonAlert>
       </IonContent>
     </IonPage>
   )
