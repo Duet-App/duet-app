@@ -1,11 +1,10 @@
-import { IonActionSheet, IonAlert, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonModal, IonPage, IonRadio, IonRadioGroup, IonTextarea, IonToolbar, TextareaChangeEventDetail, TextareaCustomEvent, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
-import { MutableRefObject, useCallback, useEffect, useRef, useState } from "react"
-import Markdown from "react-markdown"
+import { IonActionSheet, IonAlert, IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonModal, IonPage, IonRadio, IonRadioGroup, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
+import { useEffect, useRef, useState } from "react"
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { RouteComponentProps } from "react-router"
-import { arrowForwardSharp, checkmark, checkmarkSharp, close, closeSharp, ellipsisVerticalSharp, folderSharp, trashSharp } from "ionicons/icons"
+import { arrowForwardSharp, checkmark, checkmarkSharp, close, closeSharp, cloudDoneSharp, cloudOfflineSharp, ellipsisVerticalSharp, folderSharp, trashSharp } from "ionicons/icons"
 import { OverlayEventDetail } from "@ionic/core"
 import { DuetEditor } from "../components/DuetEditor"
 import NoteTitle from "../components/NoteTitle/NoteTitle"
@@ -33,6 +32,8 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
   const [projects, setProjects] = useState([])
   const [loaded, setLoaded] = useState(false)
   const [selectedProject, setSelectedProject] = useState("")
+  const [isEdited, setIsEdited] = useState(false)
+  const [isUpdated, setIsUpdated] = useState(false)
 
   const descriptionEditModal = useRef<HTMLIonModalElement>(null)
   const moveToFolderModal = useRef<HTMLIonModalElement>(null)
@@ -76,11 +77,23 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
     getNoteDetails()
   })
 
-  // useCallback(() => {
-  //   if(descEditor.current) {
-  //     descEditor.current.focus()
-  //   }
-  // }, [])
+  useEffect(() => {
+    if(note && note.description && editedDescription !== note.description) {
+      setIsEdited(true)
+    }
+  }, [editedDescription])
+
+  useEffect(() => {
+    const delayInputTimeoutId = setTimeout(async () => {
+      if(isEdited) {
+        await updateNoteDescription()
+        setIsEdited(false)
+        setIsUpdated(true)
+      }
+    }, 500);
+    return () => clearTimeout(delayInputTimeoutId);
+  }, [editedDescription, isEdited, 500]);
+
 
   const updateNoteTitle = async (title: string) => {
     setNote({...note, title: title})
@@ -114,6 +127,7 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
     if(response.ok) {
       const newNote = await db.get(note._id, {latest: true})
       setNote(newNote)
+      setEditedDescription(newNote.description)
     }
   }
 
@@ -226,6 +240,13 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
             <IonBackButton defaultHref="/"></IonBackButton>
           </IonButtons>
           <IonButtons slot="end">
+            {
+              isEdited ?
+              <IonIcon color="medium" size="medium" icon={cloudOfflineSharp}></IonIcon>
+              : !isEdited && isUpdated ?
+              <IonIcon color="success" size="medium" icon={cloudDoneSharp}></IonIcon>
+              : null
+            }
             <IonButton id="openNoteActionsSheet">
               <IonIcon slot="icon-only" icon={ellipsisVerticalSharp}></IonIcon>
             </IonButton>
@@ -234,11 +255,27 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
       </IonHeader>
       <IonContent fullscreen>
         <NoteTitle title={note.title} update={updateNoteTitle} />
-        <div id="openDescriptionEditModal" style={{padding: '0 16px 24px'}}>
-          <Markdown>
-            {note.description}
-          </Markdown>
-        </div>
+        {
+          note && note.description ?
+          <DuetEditor
+            markdownContent={editedDescription}
+            onChange={(val) => {setEditedDescription(val)}}
+            style={{
+              ".cm-scroller": {
+                overflow: 'auto',
+                minHeight: 'calc(100vh - 88px)',
+                padding: '16px',
+                fontFamily: 'var(--ion-font-family)',
+                paddingBottom: `calc(env(keyboard-inset-height, 16) + 16px)`
+              },
+              "&.cm-editor": {
+                backgroundColor: (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? "#121212" : "#ffffff",
+                outline: 'none'
+              }
+            }}
+          />
+          : null
+        }
 
         <IonActionSheet
           trigger='openNoteActionsSheet'
