@@ -1,4 +1,4 @@
-name: Build Android App, and Create Release
+name: Build Android App, Deploy PWA, and Create Release
 
 on:
   push:
@@ -20,9 +20,19 @@ jobs:
           certificate: duet-android-keystore
           filename: Duet-Android-${{ github.ref_name }}
           upload-artifact: Duet-Android-${{ github.ref_name }}-Build.zip
+  deploy_pwa:
+    name: Deploy PWA
+    runs-on: ubuntu-latest
+    concurrency: deploy-group    # optional: ensure only one action runs at a time
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
   create_release:
-    needs: [build_android]
+    needs: [build_android, deploy_pwa]
     runs-on: ubuntu-latest
 
     permissions:
