@@ -5,7 +5,7 @@ import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useEffect, useRef, useState } from "react"
 import { formatDistance } from "date-fns"
-import { add, archiveSharp, checkmark, checkmarkSharp, chevronDownSharp, closeSharp, documentTextSharp, ellipsisVerticalSharp, trashSharp } from "ionicons/icons"
+import { add, archiveSharp, checkmark, checkmarkCircleSharp, checkmarkSharp, chevronDownSharp, closeSharp, documentTextSharp, ellipsisVerticalSharp, trashSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
@@ -169,6 +169,28 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
       console.log(err)
     }
   }
+  
+  const completeProject = async () => {
+    try {
+      const timestamp = new Date().toISOString()
+      const updateProjectResponse = await db.put({
+        ...project,
+        status: project.status != "Completed" ? "Completed" : "In progress",
+        timestamps: {
+          ...project.timestamps,
+          updated: timestamp,
+          completed: project.status != "Completed" ? timestamp : null,
+          archived: null
+        }
+      })
+      if(updateProjectResponse.ok) {
+        const newProjectResponse = await db.get(project._id)
+        setProject(newProjectResponse)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   return (
     <IonPage>
@@ -190,10 +212,18 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
       </IonHeader>
       <IonContent fullscreen>
         {
-          project && project.status == "Archived"
+          project && project.status == "Archived" && project.status != "Completed"
           ?  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '4px', textAlign: 'center', background: 'var(--ion-color-light-shade)', color: 'var(--ion-color-medium)', fontSize: '0.8rem', lineHeight: 1}}>
             <IonIcon style={{fontSize: '0.79rem'}} icon={archiveSharp} color="medium"></IonIcon>
             <IonLabel style={{lineHeight: 1.2}}>Archived</IonLabel>
+          </div>
+          : null
+        }
+        {
+          project && project.status == "Completed"
+          ?  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '4px', textAlign: 'center', background: 'rgba(var(--ion-color-success-rgb), 0.7)', color: 'var(--ion-color-success-contrast)', fontSize: '0.8rem', lineHeight: 1}}>
+            <IonIcon style={{fontSize: '0.79rem'}} icon={checkmarkCircleSharp} color="light-shade"></IonIcon>
+            <IonLabel style={{lineHeight: 1.2}}>Completed</IonLabel>
           </div>
           : null
         }
@@ -331,6 +361,13 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
               }
             },
             {
+              text: project.status != "Completed" ? 'Mark complete' : 'Mark in progress',
+              icon: archiveSharp,
+              data: {
+                action: 'complete-project'
+              }
+            },
+            {
               text: 'Delete',
               icon: trashSharp,
               role: 'destructive',
@@ -351,6 +388,8 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
               deleteProjectConfirmation.current?.present()
             } else if(detail.data?.action == 'archive-project') {
               archiveProject()
+            } else if(detail.data?.action == 'complete-project') {
+              completeProject()
             }
           }}
         ></IonActionSheet>
