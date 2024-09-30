@@ -46,6 +46,9 @@ const ProjectsPage: React.FC = () => {
         if(result.rows) {
           console.log(result)
           setProjectsProgress(result.rows)
+          if(!initiallyFetched) {
+            setInitiallyFetched(true)
+          }
           setFetched(true)
         }
       }).catch((err: Error) => {
@@ -59,8 +62,9 @@ const ProjectsPage: React.FC = () => {
   const [projects, setProjects] = useState([])
   const [projectsProgress, setProjectsProgress] = useState([])
   const [fetched, setFetched] = useState(false)
+  const [initiallyFetched, setInitiallyFetched] = useState(false)
 
-  if(!fetched) {
+  if(!fetched && !initiallyFetched) {
     return (
       <IonPage>
         <IonHeader className="ion-no-border">
