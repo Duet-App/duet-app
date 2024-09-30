@@ -81,20 +81,37 @@ const Actionable: React.FC = () => {
   const filterBottomSheet = useRef<HTMLIonModalElement>(null)
 
   useEffect(() => {
-    if(filterTags.length > 0) {
-      filterActionableTasks()
-    } else {
-      setFilteredActionableTasks(actionableTasks)
-    }
-  }, [filterTags, actionableTasks])
+    filterActionableTasks()
+  }, [filterTags, actionableTasks, projects])
 
   const filterActionableTasks = async () => {
     let tasks = actionableTasks
-    tasks = tasks.filter(task => task.tags)
-    for(var i = 0; i < filterTags.length; i++) {
-      tasks = tasks.filter(task => task.tags.filter(tag => tag == filterTags[i]).length > 0)
+    if(filterTags.length > 0) {
+      tasks = tasks.filter(task => task.tags)
+      for(var i = 0; i < filterTags.length; i++) {
+        tasks = tasks.filter(task => task.tags.filter(tag => tag == filterTags[i]).length > 0)
+      }
     }
-    setFilteredActionableTasks(tasks)
+    let newTasks = []
+    let inProgressProjects = projects.filter(doc => doc.status == "In progress")
+    tasks.forEach(task => {
+      if(!task.project_id) {
+        if(newTasks.length == 0) {
+          newTasks = [task]
+        } else {
+          newTasks.push(task)
+        }
+      } else {
+        if(inProgressProjects.find(project => project._id == task.project_id)) {
+          if(newTasks.length == 0) {
+            newTasks = [task]
+          } else {
+            newTasks.push(task)
+          }
+        }
+      }
+    })
+    setFilteredActionableTasks(newTasks)
   }
 
   return (
