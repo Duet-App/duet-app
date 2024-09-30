@@ -100,7 +100,7 @@ const Today: React.FC = () => {
       // "use_index": ['inbox-items', 'inbox-items'],
       // sort: [{'timestamps.created': 'asc'}, {'title': 'asc'}]
     })
-    .then((result: object | null) => {
+    .then((result) => {
       if(result) {
         setProjects(result.docs)
         setLoaded(true)
@@ -128,31 +128,68 @@ const Today: React.FC = () => {
   const filterBottomSheet = useRef<HTMLIonModalElement>(null)
 
   useEffect(() => {
-    if(filterTags.length > 0) {
       filterOverdueTasks()
       filterTodaysTasks()
-    } else {
-      setFilteredOverdueTasks(overdueTasks)
-      setFilteredTodaysTasks(todaysTasks)
-    }
-  }, [filterTags, overdueTasks, todaysTasks])
+  }, [filterTags, overdueTasks, todaysTasks, projects])
 
   const filterTodaysTasks = async () => {
     let tasks = todaysTasks
-    tasks = tasks.filter(task => task.tags)
-    for(var i = 0; i < filterTags.length; i++) {
-      tasks = tasks.filter(task => task.tags.filter(tag => tag == filterTags[i]).length > 0)
+    if(filterTags.length > 0) {
+      tasks = tasks.filter(task => task.tags)
+      for(var i = 0; i < filterTags.length; i++) {
+        tasks = tasks.filter(task => task.tags.filter(tag => tag == filterTags[i]).length > 0)
+      }
     }
-    setFilteredTodaysTasks(tasks)
+    let newTasks = []
+    let inProgressProjects = projects.filter(doc => doc.status == "In progress")
+    tasks.forEach(task => {
+      if(!task.project_id) {
+        if(newTasks.length == 0) {
+          newTasks = [task]
+        } else {
+          newTasks.push(task)
+        }
+      } else {
+        if(inProgressProjects.find(project => project._id == task.project_id)) {
+          if(newTasks.length == 0) {
+            newTasks = [task]
+          } else {
+            newTasks.push(task)
+          }
+        }
+      }
+    })
+    setFilteredTodaysTasks(newTasks)
   }
 
   const filterOverdueTasks = async () => {
     let tasks = overdueTasks
-    tasks = tasks.filter(task => task.tags)
-    for(var i = 0; i < filterTags.length; i++) {
-      tasks = tasks.filter(task => task.tags.filter(tag => tag == filterTags[i]).length > 0)
+    if(filterTags.length > 0) {
+      tasks = tasks.filter(task => task.tags)
+      for(var i = 0; i < filterTags.length; i++) {
+        tasks = tasks.filter(task => task.tags.filter(tag => tag == filterTags[i]).length > 0)
+      }
     }
-    setFilteredOverdueTasks(tasks)
+    let newTasks = []
+    let inProgressProjects = projects.filter(doc => doc.status == "In progress")
+    tasks.forEach(task => {
+      if(!task.project_id) {
+        if(newTasks.length == 0) {
+          newTasks = [task]
+        } else {
+          newTasks.push(task)
+        }
+      } else {
+        if(inProgressProjects.find(project => project._id == task.project_id)) {
+          if(newTasks.length == 0) {
+            newTasks = [task]
+          } else {
+            newTasks.push(task)
+          }
+        }
+      }
+    })
+    setFilteredOverdueTasks(newTasks)
   }
 
   // if(!loaded) {

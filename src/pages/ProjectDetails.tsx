@@ -1,11 +1,11 @@
-import { IonActionSheet, IonAlert, IonBackButton, IonBackdrop, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTextarea, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
+import { IonActionSheet, IonAlert, IonBackButton, IonBackdrop, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonText, IonTextarea, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
 import { RouteComponentProps } from "react-router"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useEffect, useRef, useState } from "react"
 import { formatDistance } from "date-fns"
-import { add, checkmark, checkmarkSharp, chevronDownSharp, closeSharp, documentTextSharp, ellipsisVerticalSharp, trashSharp } from "ionicons/icons"
+import { add, archiveSharp, checkmark, checkmarkCircleSharp, checkmarkSharp, chevronDownSharp, closeSharp, documentTextSharp, ellipsisVerticalSharp, trashSharp } from "ionicons/icons"
 import TaskItem from "../components/Tasks/TaskItem"
 import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
@@ -149,6 +149,49 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
     }
   }
 
+  const archiveProject = async () => {
+    try {
+      const timestamp = new Date().toISOString()
+      const updateProjectResponse = await db.put({
+        ...project,
+        status: project.status == "Archived" ? "In progress" : "Archived",
+        timestamps: {
+          ...project.timestamps,
+          updated: timestamp,
+          archived: project.status == "In progress" ? timestamp : null
+        }
+      })
+      if(updateProjectResponse.ok) {
+        const newProjectResponse = await db.get(project._id)
+        setProject(newProjectResponse)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  
+  const completeProject = async () => {
+    try {
+      const timestamp = new Date().toISOString()
+      const updateProjectResponse = await db.put({
+        ...project,
+        status: project.status != "Completed" ? "Completed" : "In progress",
+        timestamps: {
+          ...project.timestamps,
+          updated: timestamp,
+          completed: project.status != "Completed" ? timestamp : null,
+          archived: null
+        }
+      })
+      if(updateProjectResponse.ok) {
+        const newProjectResponse = await db.get(project._id)
+        setProject(newProjectResponse)
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
   return (
     <IonPage>
       <IonBackdrop
@@ -168,6 +211,22 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
+        {
+          project && project.status == "Archived" && project.status != "Completed"
+          ?  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '4px', textAlign: 'center', background: 'var(--ion-color-light-shade)', color: 'var(--ion-color-medium)', fontSize: '0.8rem', lineHeight: 1}}>
+            <IonIcon style={{fontSize: '0.79rem'}} icon={archiveSharp} color="medium"></IonIcon>
+            <IonLabel style={{lineHeight: 1.2}}>Archived</IonLabel>
+          </div>
+          : null
+        }
+        {
+          project && project.status == "Completed"
+          ?  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '4px', textAlign: 'center', background: 'rgba(var(--ion-color-success-rgb), 0.7)', color: 'var(--ion-color-success-contrast)', fontSize: '0.8rem', lineHeight: 1}}>
+            <IonIcon style={{fontSize: '0.79rem'}} icon={checkmarkCircleSharp} color="light-shade"></IonIcon>
+            <IonLabel style={{lineHeight: 1.2}}>Completed</IonLabel>
+          </div>
+          : null
+        }
         <div style={{padding: '16px 16px 0'}}>
           {/* <h3>{project.title}</h3> */}
           <Title title={project.title} update={updateProjectTitle} />
@@ -267,6 +326,13 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
             </small>
             : null
           }
+          {
+            (project.timestamps && project.timestamps.archived)
+            ? <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
+              Archived: {(project.timestamps && project.timestamps.archived) ? formatDistance(project.timestamps.archived, Date.now()) + ' ago' : ''}
+            </small>
+            : null
+          }
         </div>
 
         <IonFab ref={fabRef} onClick={() => {fabRef.current?.activated ? setOverlayVisible(true) : setOverlayVisible(false)}} slot='fixed' vertical='bottom' horizontal='end'>
@@ -288,6 +354,20 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
           header='Project actions'
           buttons={[
             {
+              text: project.status != "Archived" ? 'Archive' : 'Unarchive',
+              icon: archiveSharp,
+              data: {
+                action: 'archive-project'
+              }
+            },
+            {
+              text: project.status != "Completed" ? 'Mark complete' : 'Mark in progress',
+              icon: archiveSharp,
+              data: {
+                action: 'complete-project'
+              }
+            },
+            {
               text: 'Delete',
               icon: trashSharp,
               role: 'destructive',
@@ -306,6 +386,10 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
           onDidDismiss={({detail}) => {
             if(detail.data?.action == 'delete-project') {
               deleteProjectConfirmation.current?.present()
+            } else if(detail.data?.action == 'archive-project') {
+              archiveProject()
+            } else if(detail.data?.action == 'complete-project') {
+              completeProject()
             }
           }}
         ></IonActionSheet>
