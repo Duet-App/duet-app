@@ -16,7 +16,6 @@
     "start:electron": "electron .",
     "build:electron": "electron-builder",
     "build:linux": "electron-vite build && electron-builder --linux --config"
-
   },
   "build": {
     "appId": "xyz.aharish.duet.app.desktop",
@@ -68,7 +67,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@uiw/codemirror-theme-github": "^4.23.1",
     "codemirror": "^6.0.1",
-    "codemirror-rich-markdoc": "git@github.com:segphault/codemirror-rich-markdoc.git",
+    "codemirror-rich-markdoc": "^0.0.2",
     "cordova-plugin-sqlite-2": "^1.0.7",
     "date-fns": "^3.6.0",
     "electron-is-dev": "^3.0.1",

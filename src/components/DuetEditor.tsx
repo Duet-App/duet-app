@@ -10,7 +10,8 @@ import { githubDark, githubLight } from "@uiw/codemirror-theme-github"
 import richEditor from 'codemirror-rich-markdoc/src'
 import markdocConfig from 'codemirror-rich-markdoc/example/markdoc'
 import { languages } from '@codemirror/language-data';
-import { Table } from '@lezer/markdown';
+import { Table, Strikethrough } from '@lezer/markdown';
+import { classHighlighter } from '@lezer/highlight'
 import { defaultHighlightStyle, syntaxHighlighting, indentOnInput } from '@codemirror/language'
 // import "../../node_modules/codemirror-rich-markdoc/example/style.css"
 
@@ -106,7 +107,7 @@ export const DuetEditor = ({ markdownContent, onChange, style } : { markdownCont
           markdoc: markdocConfig,
           lezer: {
             codeLanguages: languages,
-            extensions: [Table]
+            extensions: [Table, Strikethrough]
           }
         }),
         onUpdate,
@@ -118,7 +119,7 @@ export const DuetEditor = ({ markdownContent, onChange, style } : { markdownCont
           spellcheck: "true",
           autocapitalize: "on"
         }),
-        syntaxHighlighting(defaultHighlightStyle),
+        syntaxHighlighting(classHighlighter),
         // indentOnInput(),
         drawSelection(),
         rectangularSelection(),
@@ -130,7 +131,7 @@ export const DuetEditor = ({ markdownContent, onChange, style } : { markdownCont
       parent: editor.current?.shadowRoot 
     })
 
-    view.focus()
+    // view.focus()
 
     return () => {
       view.destroy()
