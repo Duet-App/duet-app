@@ -1,4 +1,4 @@
-import { IonAvatar, IonBackButton, IonBreadcrumb, IonBreadcrumbs, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonText, IonTitle, IonToolbar, isPlatform, useIonViewDidEnter } from "@ionic/react"
+import { IonAvatar, IonBackButton, IonBreadcrumb, IonBreadcrumbs, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonText, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
 import { add, documentTextSharp, folderSharp } from "ionicons/icons"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
@@ -54,6 +54,7 @@ const NotesFolderPage: React.FC<NoteFolderPageProps> = ({match}) => {
   PouchDB.plugin(PouchFind)
 
   const path = match.params.path
+  const router = useIonRouter()
 
   const [notes, setNotes] = useState<IDuetNotes[]>([])
   const [folders, setFolders] = useState<IDuetFolder[]>([])
@@ -223,7 +224,9 @@ const NotesFolderPage: React.FC<NoteFolderPageProps> = ({match}) => {
       <IonContent fullscreen>
         <IonBreadcrumbs className="ion-padding">
           <IonBreadcrumb>
-            <IonIcon icon={folderSharp}></IonIcon>
+            <IonIcon icon={folderSharp} onClick={() => {
+              router.push('/notes', 'back', 'pop')
+            }}></IonIcon>
           </IonBreadcrumb>
           {
             path.split(",").map((p, i) => {
@@ -237,7 +240,12 @@ const NotesFolderPage: React.FC<NoteFolderPageProps> = ({match}) => {
                 )
               } else {
                 return (
-                  <IonBreadcrumb>{p}</IonBreadcrumb>
+                  <IonBreadcrumb onClick={(e) => {
+                    let splitPaths = path.split(",")
+                    if(i != splitPaths.length) {
+                      router.push(`/notes/folder/${splitPaths.slice(0, i + 1).join(",")}`, 'back', 'pop') 
+                    }
+                  }}>{p}</IonBreadcrumb>
                 )
               }
             })
