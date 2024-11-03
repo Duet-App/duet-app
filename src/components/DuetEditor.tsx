@@ -131,7 +131,7 @@ export const DuetEditor = ({ markdownContent, onChange, style } : { markdownCont
       parent: editor.current?.shadowRoot 
     })
 
-    view.focus()
+    // view.focus()
 
     return () => {
       view.destroy()
