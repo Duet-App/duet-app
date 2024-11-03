@@ -3,6 +3,8 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
+  "main": "out/main/index.js",
+  "homepage": ".",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,7 +12,37 @@
     "test.e2e": "cypress run",
     "test.unit": "vitest",
     "lint": "eslint",
-    "generate-pwa-assets": "pwa-assets-generator"
+    "generate-pwa-assets": "pwa-assets-generator",
+    "start:electron": "electron .",
+    "build:electron": "electron-builder",
+    "build:linux": "electron-vite build && electron-builder --linux --config"
+
+  },
+  "build": {
+    "appId": "xyz.aharish.duet.app.desktop",
+    "productName": "Duet",
+    "extends": null,
+    "directories": {
+      "output": "electron/build",
+      "buildResources": "build"
+    },
+    "files": [
+      "out"
+    ],
+    "asarUnpack": [
+      "resources/**"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "maintainer": "Amogh Harish",
+      "category": "Productivity"
+    },
+    "appImage": {
+      "artifactName": "${name}-${version}.${ext}"
+    },
+    "npmRebuild": false
   },
   "dependencies": {
     "@capacitor/android": "6.0.0",
@@ -39,6 +71,7 @@
     "codemirror-rich-markdoc": "git@github.com:segphault/codemirror-rich-markdoc.git",
     "cordova-plugin-sqlite-2": "^1.0.7",
     "date-fns": "^3.6.0",
+    "electron-is-dev": "^3.0.1",
     "events": "^3.3.0",
     "ionicons": "^7.0.0",
     "pouchdb": "^9.0.0",
@@ -64,6 +97,9 @@
     "@vitejs/plugin-legacy": "^5.0.0",
     "@vitejs/plugin-react": "^4.0.1",
     "cypress": "^13.5.0",
+    "electron": "^33.0.1",
+    "electron-builder": "^25.1.8",
+    "electron-vite": "^2.3.0",
     "eslint": "^8.35.0",
     "eslint-plugin-react": "^7.32.2",
     "jsdom": "^22.1.0",

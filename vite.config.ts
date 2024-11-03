@@ -22,6 +22,7 @@ export default defineConfig({
   define: {
     global: {}
   },
+  base: './',
   test: {
     globals: true,
     environment: 'jsdom',
