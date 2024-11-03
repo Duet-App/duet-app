@@ -1,4 +1,4 @@
-import { IonActionSheet, IonBackdrop, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonFabList, IonGrid, IonHeader, IonIcon, IonPage, IonRow, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonToast, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
+import { IonActionSheet, IonBackdrop, IonButton, IonButtons, IonCol, IonContent, IonFab, IonFabButton, IonFabList, IonGrid, IonHeader, IonIcon, IonPage, IonRouterOutlet, IonRow, IonSplitPane, IonText, IonTitle, IonToolbar, isPlatform, useIonRouter, useIonToast, useIonViewDidEnter, useIonViewWillEnter } from '@ionic/react';
 import './Home.css';
 import React, { useEffect, useRef, useState } from 'react';
 import PouchDB from 'pouchdb'
@@ -11,6 +11,18 @@ import { Preferences } from '@capacitor/preferences';
 import HomeCardsUI from '../components/Home/CardsUI';
 import HomeListUI from '../components/Home/ListUI';
 import "./fab.css"
+import Inbox from './Inbox';
+import { Redirect, Route } from 'react-router';
+import Today from './Today';
+import HomeTwoPane from '../components/Home/HomeTwoPane';
+import TaskDetails from './TaskDetails';
+import useScreenSize from '../hooks/useScreenSize';
+import Actionable from './Actionable';
+import Waiting from './Waiting';
+import Upcoming from './Upcoming';
+import AddTask from './AddTask';
+import AddNote from './AddNote';
+import NoteDetails from './NoteDetails';
 
 const Home: React.FC = () => {
 
@@ -288,6 +300,8 @@ const Home: React.FC = () => {
   const fabRef = useRef<HTMLIonFabElement>(null)
   const [overlayVisible, setOverlayVisible] = useState(false)
 
+  const screenSize = useScreenSize()
+
   if(isPlatform('android')) {
     document.addEventListener('ionBackButton', (ev) => {
       ev.detail.register(-1, () => {
@@ -312,75 +326,204 @@ const Home: React.FC = () => {
     getHomeUI()
   }, [])
 
-  return (
-    <IonPage>
-      <IonBackdrop
-        visible={overlayVisible}
-        style={{opacity: 0.15, zIndex: overlayVisible ? 11 : -1, transition: 'opacity,background 0.25s ease-in-out'}}
-      ></IonBackdrop>
-      <IonHeader className='ion-no-border'>
-        <IonToolbar>
-          <IonTitle>Duet</IonTitle>
-          <IonButtons slot='end'>
-            <IonButton id='openActionsSheet'>
-              <IonIcon slot='icon-only' icon={ellipsisVerticalSharp} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
+  console.log(router.routeInfo.pathname.split("/").at(-1))
+
+  const isHomeURL = () => {
+    if(router.routeInfo.pathname.split("/").at(-1) === ""
+    || router.routeInfo.pathname.split("/").at(-1) === "inbox"
+    || router.routeInfo.pathname.split("/").at(-1) === "today"
+    || router.routeInfo.pathname.split("/").at(-1) === "actionable"
+    || router.routeInfo.pathname.split("/").at(-1) === "upcoming"
+    || router.routeInfo.pathname.split("/").at(-1) === "waiting"
+    || (router.routeInfo.pathname.split("/").at(-2) === "notes" && router.routeInfo.pathname.split("/").at(-1) === "add")
+    || (router.routeInfo.pathname.split("/").at(-3) === "notes" && router.routeInfo.pathname.split("/").at(-2) === "details")
+    || router.routeInfo.pathname.split("/").at(-1) === "add-task") {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  const isUUIDURL = () => {
+    if(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(router.routeInfo.pathname.split("/").at(-1)!)) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  if(screenSize.width > 992) {
+    return (
+      <>
+        <div style={{width: '33vw'}}>
+          <IonPage style={{width: '33vw', borderRight: '1px solid rgba(var(--ion-color-medium-rgb), 0.1)'}}>
+            <IonBackdrop
+              visible={overlayVisible}
+              style={{opacity: 0.15, zIndex: overlayVisible ? 11 : -1, transition: 'opacity,background 0.25s ease-in-out'}}
+            ></IonBackdrop>
+            <IonHeader className='ion-no-border'>
+              <IonToolbar>
+                <IonTitle>Duet</IonTitle>
+                <IonButtons slot='end'>
+                  <IonButton id='openActionsSheet'>
+                    <IonIcon slot='icon-only' icon={ellipsisVerticalSharp} />
+                  </IonButton>
+                </IonButtons>
+              </IonToolbar>
+            </IonHeader>
+            <IonContent fullscreen>
+              {
+                (homeUI == 'list')
+                ? <HomeListUI />
+                : <HomeCardsUI />
+              }
+              <IonActionSheet
+                trigger='openActionsSheet'
+                header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + ' pre-release' : 'Duet v0.9.810 pre-release'}
+                buttons={[
+                  {
+                    text: 'Settings',
+                    icon: settingsSharp,
+                    data: {
+                      action: 'openSettings'
+                    }
+                  },
+                  {
+                    text: 'Help',
+                    icon: helpCircleSharp,
+                    data: {
+                    }
+                  },
+                  {
+                    text: 'About',
+                    icon: informationCircleSharp,
+                    data: {
+                    }
+                  },
+                ]}
+                onDidDismiss={({detail}) => {
+                  if(detail.data?.action == 'openSettings') {
+                    router.push('/settings')
+                  }
+                }}
+              ></IonActionSheet>
+              <ReloadPrompt />
+              <IonFab ref={fabRef} onClick={() => {fabRef.current?.activated ? setOverlayVisible(true) : setOverlayVisible(false)}} slot='fixed' vertical='bottom' horizontal='end'>
+                <IonFabButton>
+                  <IonIcon icon={addSharp}></IonIcon>
+                </IonFabButton>
+                <IonFabList side='top'>
+                  <IonFabButton routerLink="/add-task" data-title="Add to Inbox">
+                    <IonIcon icon={fileTraySharp}></IonIcon>
+                  </IonFabButton>
+                  <IonFabButton routerLink="/notes/add" data-title="Add note">
+                    <IonIcon icon={documentTextSharp}></IonIcon>
+                  </IonFabButton>
+                </IonFabList>
+              </IonFab>
+            </IonContent>
+          </IonPage>
+        </div>
         {
-          (homeUI == 'list')
-          ? <HomeListUI />
-          : <HomeCardsUI />
+          router.routeInfo.pathname.split("/").at(-1) !== ""
+          ?
+          <IonRouterOutlet style={{width: isHomeURL() ? '67vw' : '33vw', marginLeft: '33vw', borderRight: isHomeURL() ? 'none' : '1px solid rgba(var(--ion-color-medium-rgb), 0.1)'}}>
+            <Route path="/inbox" component={Inbox} />
+            <Route path="/today" component={Today} />
+            <Route path="/actionable" component={Actionable} />
+            <Route path="/waiting" component={Waiting} />
+            <Route path="/upcoming" component={Upcoming} />
+            <Route path="/add-task" component={AddTask} />
+            <Route path="/notes/add" component={AddNote} />
+            <Route path="/notes/details/:id" component={NoteDetails} />
+          </IonRouterOutlet>
+          : null
         }
-        <IonActionSheet
-          trigger='openActionsSheet'
-          header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + ' pre-release' : 'Duet v0.9.810 pre-release'}
-          buttons={[
-            {
-              text: 'Settings',
-              icon: settingsSharp,
-              data: {
-                action: 'openSettings'
+        {
+          isUUIDURL()
+          ?
+          <IonRouterOutlet style={{width: '34vw', marginLeft: '66vw', borderRight: '1px solid rgba(var(--ion-color-medium-rgb), 0.1)'}}>
+            <Route path="/inbox/:id" component={TaskDetails} />
+            <Route path="/today/:id" component={TaskDetails} />
+            <Route path="/actionable/:id" component={TaskDetails} />
+            <Route path="/waiting/:id" component={TaskDetails} />
+            <Route path="/upcoming/:id" component={TaskDetails} />
+          </IonRouterOutlet>
+          : null
+        }
+      </>
+    );
+  } else {
+    return (
+      <IonPage>
+        <IonBackdrop
+          visible={overlayVisible}
+          style={{opacity: 0.15, zIndex: overlayVisible ? 11 : -1, transition: 'opacity,background 0.25s ease-in-out'}}
+        ></IonBackdrop>
+        <IonHeader className='ion-no-border'>
+          <IonToolbar>
+            <IonTitle>Duet</IonTitle>
+            <IonButtons slot='end'>
+              <IonButton id='openActionsSheet'>
+                <IonIcon slot='icon-only' icon={ellipsisVerticalSharp} />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent fullscreen>
+          {
+            (homeUI == 'list')
+            ? <HomeListUI />
+            : <HomeCardsUI />
+          }
+          <IonActionSheet
+            trigger='openActionsSheet'
+            header={isPlatform('capacitor') && appInfo! ? appInfo.name + ' v' + appInfo.version + '.' + appInfo.build + ' pre-release' : 'Duet v0.9.810 pre-release'}
+            buttons={[
+              {
+                text: 'Settings',
+                icon: settingsSharp,
+                data: {
+                  action: 'openSettings'
+                }
+              },
+              {
+                text: 'Help',
+                icon: helpCircleSharp,
+                data: {
+                }
+              },
+              {
+                text: 'About',
+                icon: informationCircleSharp,
+                data: {
+                }
+              },
+            ]}
+            onDidDismiss={({detail}) => {
+              if(detail.data?.action == 'openSettings') {
+                router.push('/settings')
               }
-            },
-            {
-              text: 'Help',
-              icon: helpCircleSharp,
-              data: {
-              }
-            },
-            {
-              text: 'About',
-              icon: informationCircleSharp,
-              data: {
-              }
-            },
-          ]}
-          onDidDismiss={({detail}) => {
-            if(detail.data?.action == 'openSettings') {
-              router.push('/settings')
-            }
-          }}
-        ></IonActionSheet>
-        <ReloadPrompt />
-        <IonFab ref={fabRef} onClick={() => {fabRef.current?.activated ? setOverlayVisible(true) : setOverlayVisible(false)}} slot='fixed' vertical='bottom' horizontal='end'>
-          <IonFabButton>
-            <IonIcon icon={addSharp}></IonIcon>
-          </IonFabButton>
-          <IonFabList side='top'>
-            <IonFabButton routerLink="/add-task" data-title="Add to Inbox">
-              <IonIcon icon={fileTraySharp}></IonIcon>
+            }}
+          ></IonActionSheet>
+          <ReloadPrompt />
+          <IonFab ref={fabRef} onClick={() => {fabRef.current?.activated ? setOverlayVisible(true) : setOverlayVisible(false)}} slot='fixed' vertical='bottom' horizontal='end'>
+            <IonFabButton>
+              <IonIcon icon={addSharp}></IonIcon>
             </IonFabButton>
-            <IonFabButton routerLink="/notes/add" data-title="Add note">
-              <IonIcon icon={documentTextSharp}></IonIcon>
-            </IonFabButton>
-          </IonFabList>
-        </IonFab>
-      </IonContent>
-    </IonPage>
-  );
+            <IonFabList side='top'>
+              <IonFabButton routerLink="/add-task" data-title="Add to Inbox">
+                <IonIcon icon={fileTraySharp}></IonIcon>
+              </IonFabButton>
+              <IonFabButton routerLink="/notes/add" data-title="Add note">
+                <IonIcon icon={documentTextSharp}></IonIcon>
+              </IonFabButton>
+            </IonFabList>
+          </IonFab>
+        </IonContent>
+      </IonPage>
+    );
+  }
 };
 
 export default Home;

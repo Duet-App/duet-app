@@ -6,6 +6,14 @@ ion-list.md {
   background: transparent;
 }
 
+ion-item.md.active::part(native) {
+  background: var(--ion-background-color-step-50);
+}
+
+ion-list.md.active {
+  background: transparent;
+}
+
 ion-modal.statusPickerModal {
   --width: max-content;
   --min-width: 300px;

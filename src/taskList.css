@@ -16,3 +16,7 @@ ion-item.task-item .status-wrapper ion-icon {
 ion-item.task-item button {
   z-index: 3;
 }
+
+ion-item.task-item.active {
+  background: var(--ion-background-color-step-50);
+}

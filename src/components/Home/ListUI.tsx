@@ -1,29 +1,30 @@
-import { IonButton, IonIcon, IonItem, IonLabel, IonList, IonListHeader } from "@ionic/react"
+import { IonButton, IonIcon, IonItem, IonLabel, IonList, IonListHeader, useIonRouter } from "@ionic/react"
 import { calendarSharp, checkmarkCircleSharp, fileTraySharp, pauseCircleSharp, starSharp } from "ionicons/icons"
 import ProjectsTile from "./List/Projects"
 import NotesTile from "./List/Notes"
 
 const HomeListUI = () => {
+  const router = useIonRouter()
   return (
     <>
       <IonList>
-        <IonItem button routerLink="/inbox">
+        <IonItem className={router.routeInfo.pathname.includes("inbox") ? "active" : ""} button routerLink={(window.innerWidth > 992) ? "/inbox" : "/inbox"} >
           <IonIcon slot="start" style={{color: '#2196F3'}} icon={fileTraySharp} />
           <IonLabel>Inbox</IonLabel>
         </IonItem>
-        <IonItem button routerLink="/today">
+        <IonItem className={router.routeInfo.pathname.includes("today") ? "active" : ""} button routerLink={(window.innerWidth > 992) ? "/today" : "/today"}>
           <IonIcon slot="start" style={{color: '#F9A825'}} icon={starSharp} />
           <IonLabel>Today</IonLabel>
         </IonItem>
-        <IonItem button routerLink="/actionable">
+        <IonItem className={router.routeInfo.pathname.includes("actionable") ? "active" : ""} button routerLink="/actionable">
           <IonIcon slot="start" style={{color: '#689F38'}} icon={checkmarkCircleSharp} />
           <IonLabel>Actionable</IonLabel>
         </IonItem>
-        <IonItem button routerLink="/waiting">
+        <IonItem className={router.routeInfo.pathname.includes("waiting") ? "active" : ""} button routerLink="/waiting">
           <IonIcon slot="start" color="medium" icon={pauseCircleSharp} />
           <IonLabel>Waiting for</IonLabel>
         </IonItem>
-        <IonItem button lines="none" routerLink="/upcoming">
+        <IonItem className={router.routeInfo.pathname.includes("upcoming") ? "active" : ""} button lines="none" routerLink="/upcoming">
           <IonIcon slot="start" style={{color: '#F44336'}} icon={calendarSharp} />
           <IonLabel>Upcoming</IonLabel>
         </IonItem>

@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from 'pouchdb-adapter-cordova-sqlite'
-import { useHistory } from "react-router";
+import { RouteComponentProps, useHistory } from "react-router";
 import TaskItem from "../components/Tasks/TaskItem";
 import TasksSkeletonLoader from "../components/TasksSkeletonLoader";
 
-const Actionable: React.FC = () => {
+const Actionable: React.FC<RouteComponentProps> = ({match}) => {
 
   let db: PouchDB.Database
   if(isPlatform('capacitor')) {
@@ -139,7 +139,7 @@ const Actionable: React.FC = () => {
             {
               filteredActionableTasks.map(task => {
                 return (
-                  <TaskItem key={task._id} task={task} updateFn={getActionableTasks} project={task.project_id ? projects.find(p => p._id == task.project_id) : null} />
+                  <TaskItem key={task._id} task={task} updateFn={getActionableTasks} project={task.project_id ? projects.find(p => p._id == task.project_id) : null} url={match?.url} />
                 )
               })
             }
