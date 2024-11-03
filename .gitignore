@@ -30,3 +30,12 @@ yarn-error.log*
 # Optional eslint cache
 .eslintcache
 dev-dist/sw.js
+
+# Sentry Config File
+.env.sentry-build-plugin
+
+
+# Electron
+
+out
+electron/build
