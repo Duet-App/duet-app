@@ -96,6 +96,9 @@ const NoteDetails: React.FC<NoteDetailsPageProps> = ({match}) => {
 
 
   const updateNoteTitle = async (title: string) => {
+    if(note.title === title) {
+      return
+    }
     setNote({...note, title: title})
     const timestamp = new Date().toISOString()
     
