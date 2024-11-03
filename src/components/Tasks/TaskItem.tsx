@@ -18,7 +18,7 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
     db = new PouchDB('duet');
   }
 
-  const { task, updateFn, project } = props
+  const { task, updateFn, project, url } = props
 
   const router = useIonRouter()
 
@@ -81,7 +81,7 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
   }
   
   return (
-    <IonItem className="task-item" key={task._id} button onClick={() => {router.push("/tasks/" + task._id)}}>
+    <IonItem className={"task-item " + ( router?.routeInfo.pathname.split("/").at(-1) === task._id ? "active" : "" )} key={task._id} button onClick={() => {router.push(url! + "/" + task._id)}}>
       <div slot="start" className="status-wrapper ion-activatable" onClick={(e) => {openModal(task._id); e.stopPropagation()}}>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
         <IonIcon icon={icons[task.status].icon} onClick={() => {}} color={icons[task.status].color}></IonIcon>

@@ -1,5 +1,5 @@
-import { IonActionSheet, IonAlert, IonBackButton, IonBackdrop, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonText, IonTextarea, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
-import { RouteComponentProps } from "react-router"
+import { IonActionSheet, IonAlert, IonBackButton, IonBackdrop, IonButton, IonButtons, IonCheckbox, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonRouterOutlet, IonText, IonTextarea, IonToolbar, isPlatform, useIonRouter, useIonViewDidEnter } from "@ionic/react"
+import { Route, RouteComponentProps } from "react-router"
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
@@ -11,6 +11,7 @@ import NoteItem from "../components/Notes/NoteItem"
 import Markdown from "react-markdown"
 import Title from "../components/Title/Title"
 import "./fab.css"
+import TaskDetails from "./TaskDetails"
 
 interface ProjectDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -193,229 +194,236 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
   }
 
   return (
-    <IonPage>
-      <IonBackdrop
-        visible={overlayVisible}
-        style={{opacity: 0.15, zIndex: overlayVisible ? 11 : -1, transition: 'opacity,background 0.25s ease-in-out'}}
-      ></IonBackdrop>
-      <IonHeader className="ion-no-border">
-        <IonToolbar>
-          <IonButtons slot='start'>
-            <IonBackButton defaultHref='/'></IonBackButton>
-          </IonButtons>
-          <IonButtons slot="end">
-            <IonButton id="openProjectActionsSheet">
-              <IonIcon slot="icon-only" icon={ellipsisVerticalSharp}></IonIcon>
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent fullscreen>
-        {
-          project && project.status == "Archived" && project.status != "Completed"
-          ?  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '4px', textAlign: 'center', background: 'var(--ion-color-light-shade)', color: 'var(--ion-color-medium)', fontSize: '0.8rem', lineHeight: 1}}>
-            <IonIcon style={{fontSize: '0.79rem'}} icon={archiveSharp} color="medium"></IonIcon>
-            <IonLabel style={{lineHeight: 1.2}}>Archived</IonLabel>
-          </div>
-          : null
-        }
-        {
-          project && project.status == "Completed"
-          ?  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '4px', textAlign: 'center', background: 'rgba(var(--ion-color-success-rgb), 0.7)', color: 'var(--ion-color-success-contrast)', fontSize: '0.8rem', lineHeight: 1}}>
-            <IonIcon style={{fontSize: '0.79rem'}} icon={checkmarkCircleSharp} color="light-shade"></IonIcon>
-            <IonLabel style={{lineHeight: 1.2}}>Completed</IonLabel>
-          </div>
-          : null
-        }
-        <div style={{padding: '16px 16px 0'}}>
-          {/* <h3>{project.title}</h3> */}
-          <Title title={project.title} update={updateProjectTitle} />
-          {
-            !projectDescEditing
-            ? <div
-              style={{color: project.description ? 'initial' : 'var(--ion-color-medium)'}}
-              onClick={() => {
-                setProjectDescEditing(true)
-              }}
-            >
-              <Markdown
-              >
-                {project.description ? project.description : 'Tap to set a description'}
-              </Markdown>
-            </div>
-            : <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8}}>
-              <IonTextarea ref={projectDescEditor} value={description} onIonInput={(e) => {setDescription(e.detail.value!)}} aria-label="Description" placeholder="Enter description" autoGrow={true} rows={1}></IonTextarea>
-              <IonButton size="small" onClick={updateProjectDescription}>
-                <IonIcon slot="icon-only" icon={checkmarkSharp}></IonIcon>
-              </IonButton>
-            </div>
-          }
-        </div>
-
-        {
-          projectTasks.length > 0
-          ? <IonList style={{marginTop: 32}}>
+    <>
+      <div style={{width: router.routeInfo.pathname.includes("tasks") ? '33vw': '67vw'}}>
+        <IonPage style={{width: router.routeInfo.pathname.includes("tasks") ? '33vw': '67vw'}}>
+          <IonBackdrop
+            visible={overlayVisible}
+            style={{opacity: 0.15, zIndex: overlayVisible ? 11 : -1, transition: 'opacity,background 0.25s ease-in-out'}}
+          ></IonBackdrop>
+          <IonHeader className="ion-no-border">
+            <IonToolbar>
+              <IonButtons slot='start'>
+                <IonBackButton defaultHref='/'></IonBackButton>
+              </IonButtons>
+              <IonButtons slot="end">
+                <IonButton id="openProjectActionsSheet">
+                  <IonIcon slot="icon-only" icon={ellipsisVerticalSharp}></IonIcon>
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent fullscreen>
             {
-              projectTasks.map(task => {
-                return (
-                  <TaskItem key={task._id} task={task} updateFn={getProject} />
-                  // <IonItem key={task._id} routerLink={"/tasks/" + task._id}>
-                  //   <IonCheckbox slot="start"></IonCheckbox>
-                  //   <IonLabel
-                  //     style={{textDecoration: (task.status == "Done" || task.status == "Cancelled") ? 'line-through' : 'none'}}
-                  //     color={(task.status == "Done" || task.status == "Cancelled") ? 'medium' : 'initial'}
-                  //   >
-                  //     {task.title}
-                  //   </IonLabel>
-                  // </IonItem>
-                )
-              })
-            }
-          </IonList>
-          : <p className="ion-padding" style={{color: 'var(--ion-color-medium)'}}>No tasks found! Add a task to <strong>"{project.title}"</strong> by clicking on the "+" button below.</p>
-        }
-
-        {
-          completedProjectTasks.length > 0
-          ? <IonList style={{marginTop: 24}}>
-            <IonListHeader>
-              <IonLabel>Completed</IonLabel>
-              <IonButton size="small" onClick={toggleCompletedTaskView}>{ showCompleted ? "Hide" : "Show" }</IonButton>
-            </IonListHeader>
-            {
-              showCompleted
-              ? completedProjectTasks.map(task => {
-                return (
-                  <TaskItem key={task._id} task={task} updateFn={getProject} />
-                )
-              })
+              project && project.status == "Archived" && project.status != "Completed"
+              ?  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '4px', textAlign: 'center', background: 'var(--ion-color-light-shade)', color: 'var(--ion-color-medium)', fontSize: '0.8rem', lineHeight: 1}}>
+                <IonIcon style={{fontSize: '0.79rem'}} icon={archiveSharp} color="medium"></IonIcon>
+                <IonLabel style={{lineHeight: 1.2}}>Archived</IonLabel>
+              </div>
               : null
             }
-          </IonList>
-          : null
-        }
- 
-        {
-          projectNotes.length > 0
-          ? <>
-          <IonList style={{marginTop: showCompleted ? 24 : 8}}>
-            <IonListHeader>Project Support Material</IonListHeader>
             {
-              projectNotes.map(note => {
-                return (
-                  <NoteItem key={note._id} note={note} />
-                )
-              })
+              project && project.status == "Completed"
+              ?  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', padding: '4px', textAlign: 'center', background: 'rgba(var(--ion-color-success-rgb), 0.7)', color: 'var(--ion-color-success-contrast)', fontSize: '0.8rem', lineHeight: 1}}>
+                <IonIcon style={{fontSize: '0.79rem'}} icon={checkmarkCircleSharp} color="light-shade"></IonIcon>
+                <IonLabel style={{lineHeight: 1.2}}>Completed</IonLabel>
+              </div>
+              : null
             }
-          </IonList>
-          </>
-          : null
-        }
+            <div style={{padding: '16px 16px 0'}}>
+              {/* <h3>{project.title}</h3> */}
+              <Title title={project.title} update={updateProjectTitle} />
+              {
+                !projectDescEditing
+                ? <div
+                  style={{color: project.description ? 'initial' : 'var(--ion-color-medium)'}}
+                  onClick={() => {
+                    setProjectDescEditing(true)
+                  }}
+                >
+                  <Markdown
+                  >
+                    {project.description ? project.description : 'Tap to set a description'}
+                  </Markdown>
+                </div>
+                : <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8}}>
+                  <IonTextarea ref={projectDescEditor} value={description} onIonInput={(e) => {setDescription(e.detail.value!)}} aria-label="Description" placeholder="Enter description" autoGrow={true} rows={1}></IonTextarea>
+                  <IonButton size="small" onClick={updateProjectDescription}>
+                    <IonIcon slot="icon-only" icon={checkmarkSharp}></IonIcon>
+                  </IonButton>
+                </div>
+              }
+            </div>
 
-        <div style={{marginTop: 32, padding: '16px'}}>
-          <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
-            Created: {project.timestamps ? formatDistance(project.timestamps.created, Date.now()) + ' ago' : ''}
-          </small>
-          <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
-            Updated: {project.timestamps ? formatDistance(project.timestamps.updated, Date.now()) + ' ago' : ''}
-          </small>
-          {
-            (project.timestamps && project.timestamps.completed)
-            ? <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
-              Completed: {(project.timestamps && project.timestamps.completed) ? formatDistance(project.timestamps.completed, Date.now()) + ' ago' : ''}
-            </small>
-            : null
-          }
-          {
-            (project.timestamps && project.timestamps.archived)
-            ? <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
-              Archived: {(project.timestamps && project.timestamps.archived) ? formatDistance(project.timestamps.archived, Date.now()) + ' ago' : ''}
-            </small>
-            : null
-          }
-        </div>
+            {
+              projectTasks.length > 0
+              ? <IonList style={{marginTop: 32}}>
+                {
+                  projectTasks.map(task => {
+                    return (
+                      <TaskItem key={task._id} task={task} updateFn={getProject} url={match.url} />
+                      // <IonItem key={task._id} routerLink={"/tasks/" + task._id}>
+                      //   <IonCheckbox slot="start"></IonCheckbox>
+                      //   <IonLabel
+                      //     style={{textDecoration: (task.status == "Done" || task.status == "Cancelled") ? 'line-through' : 'none'}}
+                      //     color={(task.status == "Done" || task.status == "Cancelled") ? 'medium' : 'initial'}
+                      //   >
+                      //     {task.title}
+                      //   </IonLabel>
+                      // </IonItem>
+                    )
+                  })
+                }
+              </IonList>
+              : <p className="ion-padding" style={{color: 'var(--ion-color-medium)'}}>No tasks found! Add a task to <strong>"{project.title}"</strong> by clicking on the "+" button below.</p>
+            }
 
-        <IonFab ref={fabRef} onClick={() => {fabRef.current?.activated ? setOverlayVisible(true) : setOverlayVisible(false)}} slot='fixed' vertical='bottom' horizontal='end'>
-          <IonFabButton>
-            <IonIcon icon={add}></IonIcon>
-          </IonFabButton>
-          <IonFabList side="top">
-            <IonFabButton routerLink={"/project/add-task/" + match.params.id} data-title="Add task">
-              <IonIcon icon={checkmarkSharp}></IonIcon>
-            </IonFabButton>
-            <IonFabButton routerLink={"/notes/add/" + match.params.id} data-title="Add note">
-              <IonIcon icon={documentTextSharp}></IonIcon>
-            </IonFabButton>
-          </IonFabList>
-        </IonFab>
+            {
+              completedProjectTasks.length > 0
+              ? <IonList style={{marginTop: 24}}>
+                <IonListHeader>
+                  <IonLabel>Completed</IonLabel>
+                  <IonButton size="small" onClick={toggleCompletedTaskView}>{ showCompleted ? "Hide" : "Show" }</IonButton>
+                </IonListHeader>
+                {
+                  showCompleted
+                  ? completedProjectTasks.map(task => {
+                    return (
+                      <TaskItem key={task._id} task={task} updateFn={getProject} />
+                    )
+                  })
+                  : null
+                }
+              </IonList>
+              : null
+            }
+    
+            {
+              projectNotes.length > 0
+              ? <>
+              <IonList style={{marginTop: showCompleted ? 24 : 8}}>
+                <IonListHeader>Project Support Material</IonListHeader>
+                {
+                  projectNotes.map(note => {
+                    return (
+                      <NoteItem key={note._id} note={note} />
+                    )
+                  })
+                }
+              </IonList>
+              </>
+              : null
+            }
 
-        <IonActionSheet
-          trigger='openProjectActionsSheet'
-          header='Project actions'
-          buttons={[
-            {
-              text: project.status != "Archived" ? 'Archive' : 'Unarchive',
-              icon: archiveSharp,
-              data: {
-                action: 'archive-project'
+            <div style={{marginTop: 32, padding: '16px'}}>
+              <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
+                Created: {project.timestamps ? formatDistance(project.timestamps.created, Date.now()) + ' ago' : ''}
+              </small>
+              <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
+                Updated: {project.timestamps ? formatDistance(project.timestamps.updated, Date.now()) + ' ago' : ''}
+              </small>
+              {
+                (project.timestamps && project.timestamps.completed)
+                ? <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
+                  Completed: {(project.timestamps && project.timestamps.completed) ? formatDistance(project.timestamps.completed, Date.now()) + ' ago' : ''}
+                </small>
+                : null
               }
-            },
-            {
-              text: project.status != "Completed" ? 'Mark complete' : 'Mark in progress',
-              icon: archiveSharp,
-              data: {
-                action: 'complete-project'
+              {
+                (project.timestamps && project.timestamps.archived)
+                ? <small style={{display: 'block', marginBottom: 8, color: 'var(--ion-color-medium)'}}>
+                  Archived: {(project.timestamps && project.timestamps.archived) ? formatDistance(project.timestamps.archived, Date.now()) + ' ago' : ''}
+                </small>
+                : null
               }
-            },
-            {
-              text: 'Delete',
-              icon: trashSharp,
-              role: 'destructive',
-              data: {
-                action: 'delete-project'
-              }
-            },
-            {
-              text: 'Cancel',
-              icon: closeSharp,
-              role: 'cancel',
-              data: {
-              }
-            }
-          ]}
-          onDidDismiss={({detail}) => {
-            if(detail.data?.action == 'delete-project') {
-              deleteProjectConfirmation.current?.present()
-            } else if(detail.data?.action == 'archive-project') {
-              archiveProject()
-            } else if(detail.data?.action == 'complete-project') {
-              completeProject()
-            }
-          }}
-        ></IonActionSheet>
-        <IonAlert
-          ref={deleteProjectConfirmation}
-          // trigger="task-delete-confirmation"
-          header="Delete Project?"
-          message="This will permanently remove the Project, and all Tasks, and Notes associated with this Project. Do you wish to continue?"
-          buttons={[
-            {
-              text: 'Cancel',
-              role: 'cancel',
-            },
-            {
-              text: 'Delete',
-              role: 'destructive'
-            }
-          ]}
-          onDidDismiss={({detail}) => {
-            if(detail.role == 'destructive') {
-              deleteProject()
-            }
-          }}
-        ></IonAlert>
-      </IonContent>
-    </IonPage>
+            </div>
+
+            <IonFab ref={fabRef} onClick={() => {fabRef.current?.activated ? setOverlayVisible(true) : setOverlayVisible(false)}} slot='fixed' vertical='bottom' horizontal='end'>
+              <IonFabButton>
+                <IonIcon icon={add}></IonIcon>
+              </IonFabButton>
+              <IonFabList side="top">
+                <IonFabButton routerLink={"/project/add-task/" + match.params.id} data-title="Add task">
+                  <IonIcon icon={checkmarkSharp}></IonIcon>
+                </IonFabButton>
+                <IonFabButton routerLink={"/notes/add/" + match.params.id} data-title="Add note">
+                  <IonIcon icon={documentTextSharp}></IonIcon>
+                </IonFabButton>
+              </IonFabList>
+            </IonFab>
+
+            <IonActionSheet
+              trigger='openProjectActionsSheet'
+              header='Project actions'
+              buttons={[
+                {
+                  text: project.status != "Archived" ? 'Archive' : 'Unarchive',
+                  icon: archiveSharp,
+                  data: {
+                    action: 'archive-project'
+                  }
+                },
+                {
+                  text: project.status != "Completed" ? 'Mark complete' : 'Mark in progress',
+                  icon: archiveSharp,
+                  data: {
+                    action: 'complete-project'
+                  }
+                },
+                {
+                  text: 'Delete',
+                  icon: trashSharp,
+                  role: 'destructive',
+                  data: {
+                    action: 'delete-project'
+                  }
+                },
+                {
+                  text: 'Cancel',
+                  icon: closeSharp,
+                  role: 'cancel',
+                  data: {
+                  }
+                }
+              ]}
+              onDidDismiss={({detail}) => {
+                if(detail.data?.action == 'delete-project') {
+                  deleteProjectConfirmation.current?.present()
+                } else if(detail.data?.action == 'archive-project') {
+                  archiveProject()
+                } else if(detail.data?.action == 'complete-project') {
+                  completeProject()
+                }
+              }}
+            ></IonActionSheet>
+            <IonAlert
+              ref={deleteProjectConfirmation}
+              // trigger="task-delete-confirmation"
+              header="Delete Project?"
+              message="This will permanently remove the Project, and all Tasks, and Notes associated with this Project. Do you wish to continue?"
+              buttons={[
+                {
+                  text: 'Cancel',
+                  role: 'cancel',
+                },
+                {
+                  text: 'Delete',
+                  role: 'destructive'
+                }
+              ]}
+              onDidDismiss={({detail}) => {
+                if(detail.role == 'destructive') {
+                  deleteProject()
+                }
+              }}
+            ></IonAlert>
+          </IonContent>
+        </IonPage>
+      </div>
+      <IonRouterOutlet style={{width: router.routeInfo.pathname.includes("tasks") ? '34vw' : 0, marginLeft: '33vw'}}>
+        <Route path="/project/details/:projectid/tasks/:id" component={TaskDetails}/>
+      </IonRouterOutlet>
+    </>
   )
 }
 

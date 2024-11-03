@@ -1,4 +1,4 @@
-import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonModal, IonPage, IonRippleEffect, IonRow, IonSkeletonText, IonSpinner, IonText, IonTitle, IonToolbar, isPlatform, useIonModal, useIonRouter, useIonViewDidEnter } from "@ionic/react"
+import { IonBackButton, IonButton, IonButtons, IonCheckbox, IonCol, IonContent, IonFab, IonFabButton, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonList, IonModal, IonPage, IonRippleEffect, IonRouterOutlet, IonRow, IonSkeletonText, IonSpinner, IonText, IonTitle, IonToolbar, isPlatform, useIonModal, useIonRouter, useIonViewDidEnter } from "@ionic/react"
 import { add, checkmarkCircle, chevronForwardCircle, closeCircle, closeCircleOutline, ellipseOutline, pauseCircle } from "ionicons/icons";
 import { useEffect, useRef, useState } from "react";
 import PouchDB from "pouchdb"
@@ -9,8 +9,10 @@ import '../taskList.css'
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import TaskItem from "../components/Tasks/TaskItem";
 import TasksSkeletonLoader from "../components/TasksSkeletonLoader";
+import { Route, RouteComponentProps } from "react-router";
+import TaskDetails from "./TaskDetails";
 
-const Inbox: React.FC = () => {
+const Inbox: React.FC<RouteComponentProps> = ({match}) => {
 
   let db: PouchDB.Database
 
@@ -87,19 +89,17 @@ const Inbox: React.FC = () => {
             {
               inboxTasks.map(task => {
                 return (
-                  <TaskItem key={task._id} task={task} updateFn={getInboxTasks} />
+                  <TaskItem key={task._id} task={task} updateFn={getInboxTasks} url={match?.url} />
                 )
               })
             }
           </IonList>
         }
-
         <IonFab slot='fixed' vertical='bottom' horizontal='end'>
           <IonFabButton routerLink="/add-task">
             <IonIcon icon={add}></IonIcon>
           </IonFabButton>
         </IonFab>
-
       </IonContent>
     </IonPage>
   )

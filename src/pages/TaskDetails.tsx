@@ -13,10 +13,14 @@ import Description from '../components/Title/Description'
 import { formatDistance } from 'date-fns'
 
 interface TaskDetailsPageProps extends RouteComponentProps<{
+  projectid?: string,
   id: string
 }> {}
 
 const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
+
+  // console.log("ProjectID", match.params.projectid!)
+  console.log("TaskID", match.params.id)
 
   let db: PouchDB.Database
   if(isPlatform('capacitor')) {

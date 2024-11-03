@@ -9,6 +9,7 @@ import TagsPage from './pages/Tags';
 import ProjectsPage from './pages/Projects';
 import AddProject from './pages/AddProject';
 import AddTask from './pages/AddTask';
+import useScreenSize from './hooks/useScreenSize';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -54,6 +55,7 @@ import ReloadPrompt from './components/ReloadPrompt';
 import Actionable from './pages/Actionable';
 import NotesFolderPage from './pages/NotesFolder';
 import Waiting from './pages/Waiting';
+import ThreePaneUI from './components/ThreePaneUI';
 
 setupIonicReact({
   mode: 'md'
@@ -79,64 +81,71 @@ async function setStatusBarStyleLight() {
   })
 };
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
-        <Route exact path="/home">
-          <Home />
-        </Route>
-        <Route exact path="/today">
-          <Today />
-        </Route>
-        <Route exact path="/actionable">
-          <Actionable />
-        </Route>
-        <Route exact path="/upcoming">
-          <Upcoming />
-        </Route>
-        <Route exact path="/waiting">
-          <Waiting />
-        </Route>
-        <Route exact path="/project">
-          <ProjectsPage />
-        </Route>
-        <Route exact path="/project/add">
-          <AddProject />
-        </Route>
-        <Route exact path="/project/details/:id" component={ProjectDetailsPage}/>
-        <Route path="/project/add-task/:id">
-          <AddTask />
-        </Route>
-        <Route exact path="/tags">
-          <TagsPage />
-        </Route>
-        <Route path="/tasks/:id" component={TaskDetails}/>
-        <Route exact path="/inbox">
-          <Inbox />
-        </Route>
-        <Route exact path="/notes">
-          <NotesPage />
-        </Route>
-        <Route exact path="/notes/add" component={AddNote} />
-        <Route exact path="/notes/add/:id" component={AddNote} />
-        <Route path="/notes/details/:id" component={NoteDetails} />
-        <Route path="/notes/folder/:path" component={NotesFolderPage} />
-        <Route exact path="/logbook">
-          <LogbookPage />
-        </Route>
-        <Route exact path="/add-task">
-          <AddTask />
-        </Route>
-        <Route exact path="/settings">
-          <SettingsPage />
-        </Route>
-        <Route exact path="/">
-          <Redirect to="/home" />
-        </Route>
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+
+  const screenSize = useScreenSize()
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        {
+          screenSize.width > 992
+          ? <ThreePaneUI />
+          :
+          <IonRouterOutlet>
+            {/* <Route exact path="/home" component={Home}>
+            </Route> */}
+            <Route exact path="/" component={Home}>
+            </Route>
+            <Route exact path="/today" component={Today} />
+            <Route exact path="/actionable" component={Actionable} />
+            <Route exact path="/upcoming" component={Upcoming} />
+            <Route exact path="/waiting" component={Waiting} />
+            {/* <Route exact path="/project">
+              <ProjectsPage />
+            </Route> */}
+            <Route path="/project" render={() => <ProjectsPage />} />
+            <Route exact path="/project/add">
+              <AddProject />
+            </Route>
+            <Route exact path="/project/details/:id" component={ProjectDetailsPage}/>
+            <Route path="/project/add-task/:id">
+              <AddTask />
+            </Route>
+            <Route exact path="/tags">
+              <TagsPage />
+            </Route>
+            <Route path="/tasks/:id" component={TaskDetails}/>
+            <Route exact path="/inbox" component={Inbox} />
+            <Route exact path="/inbox/:id" component={TaskDetails} />
+            <Route exact path="/actionable/:id" component={TaskDetails} />
+            <Route exact path="/waiting/:id" component={TaskDetails} />
+            <Route exact path="/upcoming/:id" component={TaskDetails} />
+            <Route exact path="/today/:id" component={TaskDetails} />
+            <Route exact path="/notes">
+              <NotesPage />
+            </Route>
+            <Route exact path="/notes/add" component={AddNote} />
+            <Route exact path="/notes/add/:id" component={AddNote} />
+            <Route path="/notes/details/:id" component={NoteDetails} />
+            <Route path="/notes/folder/:path" component={NotesFolderPage} />
+            <Route exact path="/logbook">
+              <LogbookPage />
+            </Route>
+            <Route exact path="/add-task">
+              <AddTask />
+            </Route>
+            <Route exact path="/settings">
+              <SettingsPage />
+            </Route>
+            {/* <Route exact path="/">
+              <Redirect to="/home" />
+            </Route> */}
+          </IonRouterOutlet>
+        }
+      </IonReactRouter>
+    </IonApp>
+  )
+}
 
 export default App;

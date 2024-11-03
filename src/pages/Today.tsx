@@ -5,11 +5,11 @@ import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { endOfToday, formatISO, startOfToday } from "date-fns";
-import { useHistory } from "react-router";
+import { RouteComponentProps, useHistory } from "react-router";
 import TaskItem from "../components/Tasks/TaskItem";
 import TasksSkeletonLoader from "../components/TasksSkeletonLoader";
 
-const Today: React.FC = () => {
+const Today: React.FC<RouteComponentProps> = ({match}) => {
 
   let db: PouchDB.Database
   if(isPlatform('capacitor')) {
@@ -272,7 +272,7 @@ const Today: React.FC = () => {
             {
               filteredOverdueTasks.map(task => {
                 return (
-                  <TaskItem key={task._id} task={task} updateFn={getTodaysTasks} project={task.project_id ? projects.find(p => p._id == task.project_id) : null} />
+                  <TaskItem key={task._id} task={task} updateFn={getTodaysTasks} project={task.project_id ? projects.find(p => p._id == task.project_id) : null} url={match?.url} />
                 )
               })
             }
@@ -288,7 +288,7 @@ const Today: React.FC = () => {
             {
               filteredTodaysTasks.map(task => {
                 return (
-                  <TaskItem key={task._id} task={task} updateFn={getTodaysTasks} project={task.project_id ? projects.find(p => p._id == task.project_id) : null} />
+                  <TaskItem key={task._id} task={task} updateFn={getTodaysTasks} project={task.project_id ? projects.find(p => p._id == task.project_id) : null} url={match?.url} />
                 )
               })
             }

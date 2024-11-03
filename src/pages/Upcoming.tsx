@@ -6,8 +6,9 @@ import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { endOfToday, formatISO, startOfToday } from "date-fns";
 import TaskItem from "../components/Tasks/TaskItem";
+import { RouteComponentProps } from "react-router";
 
-const Upcoming: React.FC = () => {
+const Upcoming: React.FC<RouteComponentProps> = ({match}) => {
 
   let db: PouchDB.Database
   if(isPlatform('capacitor')) {
@@ -72,7 +73,7 @@ const Upcoming: React.FC = () => {
             {
               upcomingTasks.map(task => {
                 return (
-                  <TaskItem key={task._id} task={task} updateFn={getUpcomingTasks} />
+                  <TaskItem key={task._id} task={task} updateFn={getUpcomingTasks} url={match?.url} />
                   // <IonItem key={task._id} routerLink={"/tasks/" + task._id}>
                   //   <IonCheckbox legacy={true} slot="start"></IonCheckbox>
                   //   <IonLabel style={{textDecoration: task.status == "Done" ? 'line-through' : 'none'}} color={task.status == "Done" ? 'medium' : 'initial'}>{task.title}</IonLabel>

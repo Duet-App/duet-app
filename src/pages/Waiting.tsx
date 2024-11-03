@@ -8,8 +8,9 @@ import '../taskList.css'
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import TaskItem from "../components/Tasks/TaskItem";
 import TasksSkeletonLoader from "../components/TasksSkeletonLoader";
+import { RouteComponentProps } from "react-router";
 
-const Waiting: React.FC = () => {
+const Waiting: React.FC<RouteComponentProps> = ({match}) => {
 
   let db: PouchDB.Database
   if(isPlatform('capacitor')) {
@@ -74,7 +75,7 @@ const Waiting: React.FC = () => {
             {
               waitingTasks.map(task => {
                 return (
-                  <TaskItem key={task._id} task={task} updateFn={getWaitingTasks} />
+                  <TaskItem key={task._id} task={task} updateFn={getWaitingTasks} url={match?.url} />
                 )
               })
             }

@@ -29,5 +29,6 @@ interface Project extends PouchDB.Core.ExistingDocument<{
 type TaskItemProps = {
   task: Task,
   updateFn: () => void,
-  project?: Project
+  project?: Project,
+  url?: string
 }
