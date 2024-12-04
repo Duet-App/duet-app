@@ -101,14 +101,11 @@ const App: React.FC = () => {
             <Route exact path="/actionable" component={Actionable} />
             <Route exact path="/upcoming" component={Upcoming} />
             <Route exact path="/waiting" component={Waiting} />
-            {/* <Route exact path="/project">
+            <Route exact path="/project">
               <ProjectsPage />
-            </Route> */}
-            <Route path="/project" render={() => <ProjectsPage />} />
-            <Route exact path="/project/add">
-              <AddProject />
             </Route>
             <Route exact path="/project/details/:id" component={ProjectDetailsPage}/>
+            <Route path="/project/details/:projectId/:id" component={TaskDetails}/>
             <Route path="/project/add-task/:id">
               <AddTask />
             </Route>
@@ -129,6 +126,9 @@ const App: React.FC = () => {
             <Route exact path="/notes/add/:id" component={AddNote} />
             <Route path="/notes/details/:id" component={NoteDetails} />
             <Route path="/notes/folder/:path" component={NotesFolderPage} />
+            <Route exact path="/project/add">
+              <AddProject />
+            </Route>
             <Route exact path="/logbook">
               <LogbookPage />
             </Route>
