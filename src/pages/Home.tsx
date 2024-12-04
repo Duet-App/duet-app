@@ -23,6 +23,7 @@ import Upcoming from './Upcoming';
 import AddTask from './AddTask';
 import AddNote from './AddNote';
 import NoteDetails from './NoteDetails';
+import ProjectsPage from './Projects';
 
 const Home: React.FC = () => {
 
@@ -434,6 +435,7 @@ const Home: React.FC = () => {
             <Route path="/waiting" component={Waiting} />
             <Route path="/upcoming" component={Upcoming} />
             <Route path="/add-task" component={AddTask} />
+            <Route path="/project" component={ProjectsPage} />
             <Route path="/notes/add" component={AddNote} />
             <Route path="/notes/details/:id" component={NoteDetails} />
           </IonRouterOutlet>
