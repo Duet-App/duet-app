@@ -66,7 +66,7 @@ const AddProject: React.FC = () => {
         {
           title.length > 0 &&
           <IonFab slot='fixed' vertical='bottom' horizontal='end'>
-            <IonFabButton onClick={addProject} routerLink="/add-task">
+            <IonFabButton onClick={addProject}>
               <IonIcon icon={checkmark}></IonIcon>
             </IonFabButton>
           </IonFab>
