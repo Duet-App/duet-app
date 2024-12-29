@@ -69,8 +69,10 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
       let tasks = []
       let completedTasks = []
       result.rows.forEach(row => {
-        tasks.push(row.doc)
-        completedTasks.push(row.doc)
+        if(row.doc) {
+          tasks.push(row.doc)
+          completedTasks.push(row.doc)
+        } 
       });
       tasks = tasks.filter(t => (t.status != "Done")).filter(t => t.status != "Cancelled")
       completedTasks = completedTasks.filter(t => (t.status == "Done"))
