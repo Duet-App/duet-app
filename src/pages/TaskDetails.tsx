@@ -137,7 +137,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   }
 
   const updateTaskDueDate = async (e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {
-    setScheduledDate(e.detail.value || ''); 
+    setDueDate(e.detail.value || ''); 
     const timestamp = new Date().toISOString()
     
     const response = await db.put({
@@ -556,7 +556,7 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
           </IonDatetime>
         </IonModal>
         <IonModal keepContentsMounted={true} trigger='openduemodal' className='datePickerModal'>
-          <IonDatetime value={dueDate} onIonChange={(e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {updateTaskDueDate(e)}} showDefaultTitle={true} showDefaultButtons={true} showClearButton={true} presentation="date-time" minuteValues={[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]} id="scheduleddatetime">
+          <IonDatetime value={dueDate} onIonChange={(e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {updateTaskDueDate(e)}} showDefaultTitle={true} showDefaultButtons={true} showClearButton={true} presentation="date-time" minuteValues={[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]} id="duedatetime">
             <span slot="title">Select due date</span>
           </IonDatetime>
         </IonModal>
