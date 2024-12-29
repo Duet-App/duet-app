@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
-import { endOfToday, formatISO, startOfToday } from "date-fns";
+import { constructNow, endOfToday, formatISO, startOfToday } from "date-fns";
 import { RouteComponentProps, useHistory } from "react-router";
 import TaskItem from "../components/Tasks/TaskItem";
 import TasksSkeletonLoader from "../components/TasksSkeletonLoader";
@@ -21,22 +21,32 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
   PouchDB.plugin(PouchFind)
 
   async function getTodaysTasks() {
+    await db.createIndex({
+      index: {
+        fields: ['scheduled_date']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['due_date']
+      }
+    })
     db.find({
       selector: {
         type: "task",
         "$and": [
           {
-            "scheduled_date": {
+            "due_date": {
               "$gte": formatISO(startOfToday())
             },
           },
           {
-            "scheduled_date": {
+            "due_date": {
               "$lte": formatISO(endOfToday())
             },
           },
           {
-            "scheduled_date": {
+            "due_date": {
               "$ne": null
             }
           },
@@ -45,10 +55,11 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
           }
         ],
       },
-      sort: [{'scheduled_date': 'asc'}]
+      sort: [{'due_date': 'asc'}]
     }).then(result => {
       setTodaysTasks(result.docs)
       getOverdueTasks()
+      getNoDueTasks()
       getAllTags()
       getProjects()
     })
@@ -60,13 +71,43 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
         type: "task",
         "$and": [
           {
-            "scheduled_date": {
+            "due_date": {
               "$lt": formatISO(startOfToday())
+            },
+          },
+          {
+            "due_date": {
+              "$ne": null
+            }
+          },
+          {
+            "status": "Next"
+          }
+        ]
+      },
+      sort: [{'due_date': 'asc'}]
+    })
+    setOverdueTasks(result.docs)
+  }
+
+  async function getNoDueTasks() {
+    const result = await db.find({
+      selector: {
+        type: "task",
+        "$and": [
+          {
+            "scheduled_date": {
+              "$lte": formatISO(Date.now())
             },
           },
           {
             "scheduled_date": {
               "$ne": null
+            }
+          },
+          {
+            "due_date": {
+              "$eq": null
             }
           },
           {
@@ -76,7 +117,7 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
       },
       sort: [{'scheduled_date': 'asc'}]
     })
-    setOverdueTasks(result.docs)
+    setNoDueTasks(result.docs)
   }
 
   async function getAllTags() {
@@ -116,10 +157,12 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
 
   const [todaysTasks, setTodaysTasks] = useState([])
   const [overdueTasks, setOverdueTasks] = useState([])
+  const [noDueTasks, setNoDueTasks] = useState([])
   const [allTags, setAllTags] = useState([])
   const [filterTags, setFilterTags] = useState([])
   const [filteredTodaysTasks, setFilteredTodaysTasks] = useState([])
   const [filteredOverdueTasks, setFilteredOverdueTasks] = useState([])
+  const [filteredNoDueTasks, setFilteredNoDueTasks] = useState([])
   const [projects, setProjects] = useState([])
   const [loaded, setLoaded] = useState(false)
 
@@ -130,7 +173,8 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
   useEffect(() => {
       filterOverdueTasks()
       filterTodaysTasks()
-  }, [filterTags, overdueTasks, todaysTasks, projects])
+      filterNoDueTasks()
+  }, [filterTags, overdueTasks, todaysTasks, noDueTasks, projects])
 
   const filterTodaysTasks = async () => {
     let tasks = todaysTasks
@@ -190,6 +234,36 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
       }
     })
     setFilteredOverdueTasks(newTasks)
+  }
+
+  const filterNoDueTasks = async () => {
+    let tasks = noDueTasks
+    if(filterTags.length > 0) {
+      tasks = tasks.filter(task => task.tags)
+      for(var i = 0; i < filterTags.length; i++) {
+        tasks = tasks.filter(task => task.tags.filter(tag => tag == filterTags[i]).length > 0)
+      }
+    }
+    let newTasks = []
+    let inProgressProjects = projects.filter(doc => doc.status == "In progress")
+    tasks.forEach(task => {
+      if(!task.project_id) {
+        if(newTasks.length == 0) {
+          newTasks = [task]
+        } else {
+          newTasks.push(task)
+        }
+      } else {
+        if(inProgressProjects.find(project => project._id == task.project_id)) {
+          if(newTasks.length == 0) {
+            newTasks = [task]
+          } else {
+            newTasks.push(task)
+          }
+        }
+      }
+    })
+    setFilteredNoDueTasks(newTasks)
   }
 
   // if(!loaded) {
@@ -285,6 +359,9 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
           : todaysTasks.length == 0
           ? <div className="ion-padding"><IonText color='medium'>No tasks for today. Add new tasks using the blue button below.</IonText></div>
           : <IonList>
+            <IonListHeader>
+              <IonLabel>Due Today</IonLabel>
+            </IonListHeader>
             {
               filteredTodaysTasks.map(task => {
                 return (
@@ -294,6 +371,23 @@ const Today: React.FC<RouteComponentProps> = ({match}) => {
             }
           </IonList>
         }
+        {
+          filteredNoDueTasks.length > 0
+          ? <IonList style={{marginBottom: 24}}>
+            <IonListHeader>
+              <IonLabel>No due date</IonLabel>
+            </IonListHeader>
+            {
+              filteredNoDueTasks.map(task => {
+                return (
+                  <TaskItem key={task._id} task={task} updateFn={getNoDueTasks} project={task.project_id ? projects.find(p => p._id == task.project_id) : null} url={match?.url} />
+                )
+              })
+            }
+          </IonList>
+          : null
+        }
+        
 
         <IonFab slot='fixed' vertical='bottom' horizontal='end'>
           <IonFabButton routerLink="/add-task">
