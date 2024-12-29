@@ -95,12 +95,12 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
         <p>
           {
             project
-            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}><IonIcon icon={folderOutline}></IonIcon> {project.title}, </span>
+            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}><IonIcon icon={folderOutline}></IonIcon> {project.title}</span>
             : null 
           }
           {
             task.due_date
-            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
+            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8, paddingLeft: project ? '8px' : 0}}>
                 <IonIcon icon={calendarNumberOutline}></IonIcon> 
                 {formatRelative(task.due_date, new Date())}
               </span> 
