@@ -10,7 +10,7 @@ import { archiveOutline, arrowBackSharp, arrowForwardSharp, checkmark, checkmark
 import Markdown from 'react-markdown'
 import Title from '../components/Title/Title'
 import Description from '../components/Title/Description'
-import { formatDistance } from 'date-fns'
+import { format, formatDistance, formatRelative } from 'date-fns'
 
 interface TaskDetailsPageProps extends RouteComponentProps<{
   projectid?: string,
@@ -465,13 +465,13 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
           <IonItem lines='inset' id='openschedulemodal'>
             <IonLabel>
               <p>Scheduled to start on</p>
-              <div>{(scheduledDate) ? new Date(scheduledDate).toLocaleDateString() : 'Set start date'}</div>
+              <div>{(scheduledDate) ? formatRelative(scheduledDate, new Date()) : 'Set start date'}</div>
             </IonLabel>
           </IonItem>
           <IonItem lines='inset' id='openduemodal'>
             <IonLabel>
-              <p>Due on</p>
-              <div>{(dueDate) ? new Date(dueDate).toLocaleDateString() : 'Set due date'}</div>
+              <p>Due</p>
+              <div>{(dueDate) ? formatRelative(dueDate, new Date()) : 'Set due date'}</div>
             </IonLabel>
           </IonItem>
           {
@@ -551,12 +551,12 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
         ></IonActionSheet>
 
         <IonModal keepContentsMounted={true} trigger='openschedulemodal' className='datePickerModal'>
-          <IonDatetime value={scheduledDate} onIonChange={(e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {updateTaskScheduledDate(e)}} showDefaultTitle={true} showDefaultButtons={true} showClearButton={true} presentation="date" id="scheduleddatetime">
+          <IonDatetime value={scheduledDate} onIonChange={(e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {updateTaskScheduledDate(e)}} showDefaultTitle={true} showDefaultButtons={true} showClearButton={true} presentation="date-time" minuteValues={[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]} id="scheduleddatetime">
             <span slot="title">Select start date</span>
           </IonDatetime>
         </IonModal>
         <IonModal keepContentsMounted={true} trigger='openduemodal' className='datePickerModal'>
-          <IonDatetime value={scheduledDate} onIonChange={(e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {updateTaskDueDate(e)}} showDefaultTitle={true} showDefaultButtons={true} showClearButton={true} presentation="date" id="scheduleddatetime">
+          <IonDatetime value={dueDate} onIonChange={(e: IonDatetimeCustomEvent<DatetimeChangeEventDetail>) => {updateTaskDueDate(e)}} showDefaultTitle={true} showDefaultButtons={true} showClearButton={true} presentation="date-time" minuteValues={[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]} id="scheduleddatetime">
             <span slot="title">Select due date</span>
           </IonDatetime>
         </IonModal>
