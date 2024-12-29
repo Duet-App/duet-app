@@ -44,6 +44,7 @@
     "npmRebuild": false
   },
   "dependencies": {
+    "@capacitor-community/safe-area": "^6.0.0-alpha.8",
     "@capacitor/android": "6.0.0",
     "@capacitor/app": "^6.0.0",
     "@capacitor/core": "6.0.0",
