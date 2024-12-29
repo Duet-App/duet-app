@@ -1,10 +1,11 @@
 import { IonIcon, IonItem, IonLabel, IonRippleEffect, isPlatform, useIonModal, useIonRouter } from "@ionic/react";
-import { checkmarkCircle, chevronForwardCircleOutline, ellipseOutline, pauseCircleOutline, removeCircle } from "ionicons/icons";
+import { calendarNumberOutline, checkmarkCircle, chevronForwardCircleOutline, ellipseOutline, folder, folderOutline, pauseCircleOutline, removeCircle } from "ionicons/icons";
 import StatusPickerModal from "./StatusPickerModal";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
+import { formatRelative, subDays } from "date-fns";
 
 const TaskItem: React.FC<TaskItemProps> = (props) => {
 
@@ -91,11 +92,30 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
         color={task.status == "Done" ? 'medium' : 'initial'}
       >
         {task.title}
-        {
-          project
-          ? <p>{project.title}</p>
-          : null
-        }
+        <p>
+          {
+            project
+            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}><IonIcon icon={folderOutline}></IonIcon> {project.title}, </span>
+            : null 
+          }
+          {
+            task.due_date
+            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
+                <IonIcon icon={calendarNumberOutline}></IonIcon> 
+                {formatRelative(task.due_date, new Date())}
+              </span> 
+            : null
+          }
+          {
+            task.scheduled_date && task.due_date == null
+            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
+                <IonIcon icon={calendarNumberOutline}></IonIcon> 
+                {formatRelative(task.scheduled_date, new Date())}
+              </span> 
+            : null
+          }
+        </p>
+        
       </IonLabel>
     </IonItem>
   )
