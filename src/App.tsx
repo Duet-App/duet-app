@@ -56,30 +56,21 @@ import Actionable from './pages/Actionable';
 import NotesFolderPage from './pages/NotesFolder';
 import Waiting from './pages/Waiting';
 import ThreePaneUI from './components/ThreePaneUI';
+import { SafeArea } from '@capacitor-community/safe-area';
 
 setupIonicReact({
   mode: 'md'
 });
 
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  setStatusBarStyleDark()
-} else {
-  setStatusBarStyleLight()
-}
-
-async function setStatusBarStyleDark() {
-  await StatusBar.setStyle({ style: Style.Dark });
-  await StatusBar.setBackgroundColor({
-    color: "#1f1f1f"
-  })
-};
-
-async function setStatusBarStyleLight() {
-  await StatusBar.setStyle({ style: Style.Light });
-  await StatusBar.setBackgroundColor({
-    color: "#ffffff"
-  })
-};
+SafeArea.enable({
+  config: {
+    customColorsForSystemBars: true,
+    statusBarColor: '#00000000', // transparent
+    statusBarContent: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark',
+    navigationBarColor: '#00000000', // transparent
+    navigationBarContent: window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark',
+  },
+});
 
 const App: React.FC = () => {
 
