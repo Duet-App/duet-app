@@ -1,4 +1,4 @@
-import { CheckboxChangeEventDetail, DatetimeChangeEventDetail, SelectChangeEventDetail, TextareaChangeEventDetail, IonBackButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonLabel, IonList, IonModal, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, IonButton, IonInput, IonIcon, IonTextarea, IonChip, IonRow, IonText, IonItemOption, IonCheckbox, IonActionSheet, IonRadioGroup, IonRadio, IonGrid, IonCol, IonSpinner, IonFooter, IonAlert, useIonRouter, IonListHeader, useIonViewDidEnter, isPlatform } from '@ionic/react'
+import { CheckboxChangeEventDetail, DatetimeChangeEventDetail, SelectChangeEventDetail, TextareaChangeEventDetail, IonBackButton, IonButtons, IonContent, IonDatetime, IonDatetimeButton, IonHeader, IonItem, IonLabel, IonList, IonModal, IonPage, IonSelect, IonSelectOption, IonTitle, IonToolbar, IonButton, IonInput, IonIcon, IonTextarea, IonChip, IonRow, IonText, IonItemOption, IonCheckbox, IonActionSheet, IonRadioGroup, IonRadio, IonGrid, IonCol, IonSpinner, IonFooter, IonAlert, useIonRouter, IonListHeader, useIonViewDidEnter, isPlatform, IonToggle, useIonToast } from '@ionic/react'
 import PouchDB from 'pouchdb'
 import PouchFind from 'pouchdb-find'
 import CordovaSqlite from 'pouchdb-adapter-cordova-sqlite'
@@ -6,11 +6,11 @@ import { useEffect, useRef, useState } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { IonCheckboxCustomEvent, IonDatetimeCustomEvent, IonSelectCustomEvent, OverlayEventDetail, TextareaCustomEvent } from '@ionic/core'
 import './TaskDetails.css'
-import { archiveOutline, arrowBackSharp, arrowForwardSharp, checkmark, checkmarkCircle, checkmarkSharp, close, closeCircle, closeOutline, closeSharp, ellipsisVerticalSharp, pricetagsOutline, toggle, trashSharp } from 'ionicons/icons'
+import { archiveOutline, arrowBackSharp, arrowForwardSharp, checkmark, checkmarkCircle, checkmarkSharp, close, closeCircle, closeOutline, closeSharp, ellipsisVerticalSharp, pricetagsOutline, timeOutline, toggle, trashSharp } from 'ionicons/icons'
 import Markdown from 'react-markdown'
 import Title from '../components/Title/Title'
 import Description from '../components/Title/Description'
-import { format, formatDistance, formatRelative } from 'date-fns'
+import { add, addDays, addHours, addMonths, addWeeks, addYears, format, formatDistance, formatRelative } from 'date-fns'
 
 interface TaskDetailsPageProps extends RouteComponentProps<{
   projectid?: string,
@@ -33,12 +33,14 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
 
   const router = useIonRouter()
 
-  const modal = useRef<HTMLIonModalElement>(null);
+  const recursModal = useRef<HTMLIonModalElement>(null);
   const tagPickerModal = useRef<HTMLIonModalElement>(null)
   const titleEditModal = useRef<HTMLIonModalElement>(null)
   const projectPickerModal = useRef<HTMLIonModalElement>(null)
   const deleteTaskConfirmation = useRef<HTMLIonAlertElement>(null)
   const subtaskInput = useRef<HTMLIonInputElement>(null)
+  const recursEveryInput = useRef<HTMLIonInputElement>(null)
+  const recursDurationSelect = useRef<HTMLIonSelectElement>(null)
 
   const [task, setTask] = useState({})
   const [status, setStatus] = useState("Todo")
@@ -48,10 +50,16 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   const [editedTitle, setEditedTitle] = useState("")
   const [subtasks, setSubtasks] = useState([])
   const [tags, setTags] = useState([])
+  const [recurs, setRecurs] = useState({})
+  const [recursEnabled, setRecursEnabled] = useState<boolean>(false)
+  const [recursEvery, setRecursEvery] = useState<number|null>()
+  const [recursDuration, setRecursDuration] = useState<string|null>()
   const [allTags, setAllTags] = useState([])
   const [projects, setProjects] = useState([])
   const [selectedProject, setSelectedProject] = useState("")
   const [loaded, setLoaded] = useState(false)
+
+  const [presentSnackbar] = useIonToast()
 
   useIonViewDidEnter(() => {
     getTask()
@@ -67,6 +75,10 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       setScheduledDate(doc.scheduled_date)
       setDueDate(doc.due_date)
       setTags(doc.tags ? doc.tags : [])
+      setRecurs(doc.recurs ? doc.recurs : {})
+      setRecursEnabled(doc.recurs && doc.recurs.recurs ? true : false)
+      setRecursEvery(doc.recurs && doc.recurs.recurs ? doc.recurs.every : null)
+      setRecursDuration(doc.recurs && doc.recurs.recurs ? doc.recurs.duration : null)
       getProjects()
     })
   }
@@ -159,10 +171,41 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   const updateTaskStatus = async (e: IonSelectCustomEvent<SelectChangeEventDetail>) => {
     setStatus(e.detail.value || 'Todo'); 
     const timestamp = new Date().toISOString()
-    
+
+    let newDueDate
+    let newScheduledDate
+    if(e.detail.value == 'Done' && recurs && recursEnabled) {
+      if(recursDuration == 'day') {
+        newDueDate = addDays(task.due_date, Number(recursEvery))
+      } else if(recursDuration == 'hour') {
+        newDueDate = addHours(task.due_date, Number(recursEvery))
+      } else if(recursDuration == 'week') {
+        newDueDate = addWeeks(task.due_date, Number(recursEvery))
+      } else if(recursDuration == 'month') {
+        newDueDate = addMonths(task.due_date, Number(recursEvery))
+      } else if(recursDuration == 'year') {
+        newDueDate = addYears(task.due_date, Number(recursEvery))
+      }
+    }
+    if(e.detail.value == 'Done' && recurs && recursEnabled) {
+      if(recursDuration == 'day') {
+        newScheduledDate = addDays(task.scheduled_date, Number(recursEvery))
+      } else if(recursDuration == 'hour') {
+        newScheduledDate = addHours(task.scheduled_date, Number(recursEvery))
+      } else if(recursDuration == 'week') {
+        newScheduledDate = addWeeks(task.scheduled_date, Number(recursEvery))
+      } else if(recursDuration == 'month') {
+        newScheduledDate = addMonths(task.scheduled_date, Number(recursEvery))
+      } else if(recursDuration == 'year') {
+        newScheduledDate = addYears(task.scheduled_date, Number(recursEvery))
+      }
+    }
+
     const response = await db.put({
       ...task,
-      status: e.detail.value || 'Todo',
+      status: e.detail.value == 'Done' && recurs && recursEnabled ? 'Next' : e.detail.value || 'Todo',
+      due_date: e.detail.value == 'Done' && recurs && recursEnabled ? newDueDate : task.due_date,
+      scheduled_date: e.detail.value == 'Done' && recurs && recursEnabled ? newScheduledDate : task.scheduled_date,
       timestamps: {
         ...task.timestamps,
         updated: timestamp,
@@ -173,7 +216,12 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
       const newTask = await db.get(task._id, {latest: true})
       setTask(newTask)
       setStatus(newTask.status)
+      setDueDate(newTask.due_date)
+      setScheduledDate(newTask.scheduled_date)
       updateProjectTimestamps()
+      if(e.detail.value == 'Done' && recurs && recursEnabled) {
+        presentSnackbar(`Rescheduled for ${formatRelative(newTask.due_date, new Date())}`, 3000)
+      }
     }
   }
 
@@ -365,6 +413,44 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
     })
   }
 
+  const setRecurring = async (recursEvery: number, recursDuration: string) => {
+    if(dueDate == null) {
+      presentSnackbar({message: 'Please set a due date first', duration: 3000})
+      setRecursEnabled(false)
+      recursEveryInput.current!.value = null
+      recursDurationSelect.current!.value = null
+      return
+    }
+    let newRecurs = recurs
+    newRecurs = {
+      ...newRecurs,
+      recurs: recursEnabled,
+      every: recursEvery,
+      duration: recursDuration
+    }
+    setRecurs(newRecurs)
+    const timestamp = new Date().toISOString()
+    
+    const response = await db.put({
+      ...task,
+      recurs: newRecurs,
+      timestamps: {
+        ...task.timestamps,
+        updated: timestamp,
+      }
+    })
+    if(response.ok) {
+      const newTask = await db.get(task._id, {latest: true})
+      setTask(newTask)
+      setRecurs(newTask.recurs ? newTask.recurs : null)
+      setRecursEvery(newTask.recurs && newTask.recurs.recurs ? newTask.recurs.every : null)
+      setRecursDuration(recursDurationSelect.current!.value = newTask.recurs && newTask.recurs.recurs ? newTask.recurs.duration : null)
+      setRecursEnabled(newTask.recurs && newTask.recurs.recurs ? true : false)
+      updateProjectTimestamps()
+      presentSnackbar({message: newTask.recurs && newTask.recurs.recurs ? `Recurring enabled every ${newTask.recurs.every == 1 ? '' : newTask.recurs.every} ${newTask.recurs.duration}${newTask.recurs.every > 1 ? 's' : ''}` : 'Recurring disabled', duration: 3000})
+    }
+  }
+
   function onWillDismissTagPickerModal(ev: CustomEvent<OverlayEventDetail>) {
     updateTaskTags()
   }
@@ -372,6 +458,12 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
   function onWillDissmissProjectPickerModal(ev: CustomEvent<OverlayEventDetail>) {
     if(ev.detail.role == 'move') {
       moveTaskToProject()
+    }
+  }
+
+  function onWillDismissRecursModal(ev: CustomEvent<OverlayEventDetail>) {
+    if(ev.detail.role == 'set') {
+      setRecurring(ev.detail.data?.every, ev.detail.data?.duration)
     }
   }
 
@@ -484,6 +576,18 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
             </IonItem>
             : null
           }
+          <IonItem lines='inset' id='openRecursModal'>
+            <IonLabel>
+              <p>Recurs</p>
+              <div>
+                {
+                  recurs && recurs.recurs ?
+                  `Every ${recurs.every == 1 ? '' : recurs.every} ${recurs.duration}${recurs.every > 1 ? 's' : ''}`
+                  : `Task doesn't recur`
+                }
+              </div>
+            </IonLabel>
+          </IonItem>
           <IonItem lines='none' id='openTagPickerModal'>
             <IonLabel>
               <p>Tags</p>
@@ -648,6 +752,36 @@ const TaskDetails: React.FC<TaskDetailsPageProps> = ({match}) => {
               </IonRadioGroup>
             </IonList>
           </IonContent>
+        </IonModal>
+        <IonModal
+          keepContentsMounted={true}
+          ref={recursModal}
+          trigger="openRecursModal"
+          onWillDismiss={(ev) => onWillDismissRecursModal(ev)}
+          className='smallEditModal'
+        >
+          <IonHeader className='ion-no-border'>
+            <IonToolbar>
+              <IonTitle>Recurs</IonTitle>
+              <IonToggle checked={recursEnabled} onIonChange={e => {setRecursEnabled(e.detail.checked)}} style={{marginRight: 16}} slot='end'></IonToggle>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent className='ion-padding'>
+            <IonInput value={recursEvery} ref={recursEveryInput} onIonChange={e => {setRecursEvery(Number(e.detail?.value))}} type='number' label='Recurs every' placeholder='1' fill='solid' style={{textAlign: 'right'}}></IonInput>
+            <IonSelect value={recursDuration} ref={recursDurationSelect} onIonChange={e => {setRecursDuration(e.detail?.value)}} interface='popover' label='Duration' placeholder='Day' fill='solid' style={{marginTop: 8}}>
+              <IonSelectOption value="hour">Hour{recursEvery && recursEvery > 1 ? 's' : ''}</IonSelectOption>
+              <IonSelectOption value="day">Day{recursEvery && recursEvery > 1 ? 's' : ''}</IonSelectOption>
+              <IonSelectOption value="week">Week{recursEvery && recursEvery > 1 ? 's' : ''}</IonSelectOption>
+              <IonSelectOption value="month">Month{recursEvery && recursEvery > 1 ? 's' : ''}</IonSelectOption>
+              <IonSelectOption value="year">Year{recursEvery && recursEvery > 1 ? 's' : ''}</IonSelectOption>
+            </IonSelect>
+          </IonContent>
+          <IonFooter className='ion-no-border'>
+            <div style={{display: 'flex', justifyContent: 'end'}}>
+              <IonButton fill='clear' onClick={() => recursModal.current?.dismiss(null, 'dismiss')}>Cancel</IonButton>
+              <IonButton fill='clear' onClick={() => recursModal.current?.dismiss({every: recursEveryInput.current?.value, duration: recursDurationSelect.current?.value}, 'set')}>Set</IonButton>
+            </div>
+          </IonFooter>
         </IonModal>
         <IonAlert
           ref={deleteTaskConfirmation}

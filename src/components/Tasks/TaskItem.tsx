@@ -1,5 +1,5 @@
 import { IonIcon, IonItem, IonLabel, IonRippleEffect, isPlatform, useIonModal, useIonRouter } from "@ionic/react";
-import { calendarNumberOutline, checkmarkCircle, chevronForwardCircleOutline, ellipseOutline, folder, folderOutline, pauseCircleOutline, removeCircle } from "ionicons/icons";
+import { calendarNumberOutline, checkmarkCircle, chevronForwardCircleOutline, ellipseOutline, folder, folderOutline, pauseCircleOutline, removeCircle, syncOutline } from "ionicons/icons";
 import StatusPickerModal from "./StatusPickerModal";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import PouchDB from "pouchdb"
@@ -85,7 +85,7 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
     <IonItem className={"task-item " + ( router?.routeInfo.pathname.split("/").at(-1) === task._id ? "active" : "" )} key={task._id} button onClick={() => {router.push(url! + "/" + task._id)}}>
       <div slot="start" className="status-wrapper ion-activatable" onClick={(e) => {openModal(task._id); e.stopPropagation()}}>
         <IonRippleEffect type="unbounded"></IonRippleEffect>
-        <IonIcon icon={icons[task.status].icon} onClick={() => {}} color={icons[task.status].color}></IonIcon>
+        <IonIcon icon={task.recurs && task.recurs.recurs ? syncOutline : icons[task.status].icon} onClick={() => {}} color={icons[task.status].color}></IonIcon>
       </div>
       <IonLabel
         style={{textDecoration: task.status == "Done" ? 'line-through' : 'none'}}
