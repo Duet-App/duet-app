@@ -1,5 +1,5 @@
 import { IonIcon, IonItem, IonLabel, IonRippleEffect, isPlatform, useIonModal, useIonRouter } from "@ionic/react";
-import { calendarNumberOutline, checkmarkCircle, chevronForwardCircleOutline, ellipseOutline, folder, folderOutline, pauseCircleOutline, removeCircle, syncOutline } from "ionicons/icons";
+import { calendarNumberOutline, checkmarkCircle, chevronForwardCircleOutline, ellipseOutline, folder, folderOutline, pauseCircleOutline, playOutline, removeCircle, syncOutline } from "ionicons/icons";
 import StatusPickerModal from "./StatusPickerModal";
 import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-component-lib/interfaces";
 import PouchDB from "pouchdb"
@@ -133,8 +133,8 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
             : null
           }
           {
-            task.scheduled_date && task.due_date == null
-            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
+            task.due_date
+            ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 4, paddingLeft: task.scheduled_date != null ? '8px' : 0, color: isBefore(task.due_date, Date.now()) ? 'var(--ion-color-danger)' : 'var(--ion-color-medium)'}}>
                 <IonIcon icon={calendarNumberOutline}></IonIcon> 
                 {getShortTimestampString(task.due_date)}
               </span> 
