@@ -5,7 +5,7 @@ import { OverlayEventDetail } from "@ionic/react/dist/types/components/react-com
 import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
-import { formatRelative, subDays } from "date-fns";
+import { format, formatRelative, isAfter, isBefore, isSameDay, isSameWeek, isThisWeek, isToday, isTomorrow, isYesterday, subDays } from "date-fns";
 
 const TaskItem: React.FC<TaskItemProps> = (props) => {
 
@@ -80,6 +80,32 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
       })
     })
   }
+
+  const getShortTimestampString = (timestamp: string) => {
+    if(isToday(timestamp)) {
+      return format(timestamp, 'h:mm a')
+    }
+    if(isBefore(timestamp, Date.now())) {
+      if(isYesterday(timestamp)) {
+        return `Yd. ${format(timestamp, 'h:mm a')}`
+      }
+      if(isThisWeek(timestamp)) {
+        return `L. ${format(timestamp, 'iiiiii h:mm a')}`
+      } else {
+        return format(timestamp, 'dd/mm/y h:mm a')
+      }
+    }
+    if(isAfter(timestamp, Date.now())) {
+      if(isTomorrow(timestamp)) {
+        return `Tm. ${format(timestamp, 'h:mm a')}`
+      }
+      if(isThisWeek(timestamp)) {
+        return format(timestamp, 'iiiiii h:mm a')
+      } else {
+        return format(timestamp, 'dd/mm/y h:mm a')
+      }
+    }
+  }
   
   return (
     <IonItem className={"task-item " + ( router?.routeInfo.pathname.split("/").at(-1) === task._id ? "active" : "" )} key={task._id} button onClick={() => {router.push(url! + "/" + task._id)}}>
@@ -102,7 +128,7 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
             task.due_date
             ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8, paddingLeft: project ? '8px' : 0}}>
                 <IonIcon icon={calendarNumberOutline}></IonIcon> 
-                {formatRelative(task.due_date, new Date())}
+                {getShortTimestampString(task.scheduled_date)}
               </span> 
             : null
           }
@@ -110,7 +136,7 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
             task.scheduled_date && task.due_date == null
             ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 8}}>
                 <IonIcon icon={calendarNumberOutline}></IonIcon> 
-                {formatRelative(task.scheduled_date, new Date())}
+                {getShortTimestampString(task.due_date)}
               </span> 
             : null
           }
