@@ -125,9 +125,9 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
             : null 
           }
           {
-            task.due_date
+            task.scheduled_date
             ? <span style={{display: 'inline-flex', alignItems: 'center', gap: 4, paddingLeft: project ? '8px' : 0}}>
-                <IonIcon icon={calendarNumberOutline}></IonIcon> 
+                <IonIcon icon={playOutline}></IonIcon> 
                 {getShortTimestampString(task.scheduled_date)}
               </span> 
             : null
