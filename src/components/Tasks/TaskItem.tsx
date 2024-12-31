@@ -92,7 +92,7 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
       if(isThisWeek(timestamp)) {
         return `L. ${format(timestamp, 'iiiiii h:mm a')}`
       } else {
-        return format(timestamp, 'dd/mm/y h:mm a')
+        return format(timestamp, 'dd/MM/yy h:mm a')
       }
     }
     if(isAfter(timestamp, Date.now())) {
@@ -102,7 +102,7 @@ const TaskItem: React.FC<TaskItemProps> = (props) => {
       if(isThisWeek(timestamp)) {
         return format(timestamp, 'iiiiii h:mm a')
       } else {
-        return format(timestamp, 'dd/mm/y h:mm a')
+        return format(timestamp, 'dd/MM/yy h:mm a')
       }
     }
   }
