@@ -13,6 +13,7 @@ import Title from "../components/Title/Title"
 import "./fab.css"
 import TaskDetails from "./TaskDetails"
 import useScreenSize from "../hooks/useScreenSize"
+import { projects_ddoc, projects_notes_ddoc } from "../dbHelper"
 
 interface ProjectDetailsPageProps extends RouteComponentProps<{
   id: string
@@ -55,11 +56,18 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
     const doc = await db.get(match.params.id, {latest: true})
     setProject(doc)
     setDescription(doc.description)
-    getProjectTasks()
-    getProjectNotes()
+    await getProjectTasks()
+    await getProjectNotes()
   }
 
   async function getProjectTasks() {
+    try {
+      await db.put(projects_ddoc)
+    } catch (err) {
+      if(err.name !== 'conflict') {
+        throw err
+      }
+    }
     const result = await db.query('projects-ddoc/project-tasks', {
       startkey: [match.params.id],
       endkey: [match.params.id, {}],
@@ -82,6 +90,13 @@ const ProjectDetailsPage: React.FC<ProjectDetailsPageProps> = ({match}) => {
   }
 
   async function getProjectNotes() {
+    try {
+      await db.put(projects_notes_ddoc)
+    } catch (err) {
+      if(err.name !== 'conflict') {
+        throw err
+      }
+    }
     const result = await db.query('projects-notes-ddoc/project-notes', {
       startkey: [match.params.id],
       endkey: [match.params.id, {}],

@@ -4,6 +4,7 @@ import PouchDB from "pouchdb"
 import PouchFind from "pouchdb-find"
 import CordovaSqlite from "pouchdb-adapter-cordova-sqlite"
 import { useState } from "react"
+import { projects_progress_ddoc } from "../../../dbHelper"
 
 const ProjectsTile: React.FC = () => {
 
@@ -21,45 +22,60 @@ const ProjectsTile: React.FC = () => {
 
 
   useIonViewDidEnter(() => {
-    getProjects()
+    if(isPlatform('capacitor')) {
+      document.addEventListener('deviceready', async function() {
+        getProjectsProgress()
+      })
+    } else {
+      getProjectsProgress()
+    }
   })
 
-  function getProjects() {
-    setFetched(false)
-    db.find({
-      selector: {
-        "timestamps.updated": {
-          "$gt": null
+  async function getProjects() {
+    try{
+      await db.createIndex({
+        index: {
+          fields: ['timestamps.updated'],
+        }
+      })
+      const result = await db.find({
+        selector: {
+          "timestamps.updated": {
+            "$gt": null
+          },
+          type: "project",
         },
-        type: "project",
-      },
-      sort: [{'timestamps.updated': 'desc'}],
-      limit: 3
-    })
-    .then((result: object | null) => {
+        sort: [{'timestamps.updated': 'desc'}],
+        limit: 3
+      })
       if(result) {
         setProjects(result.docs)
-        getProjectsProgress()
-      }
-    }).catch((err: Error) => {
-      console.log(err)
-    })
-  }
-
-  async function getProjectsProgress() {
-    db.query('projects-progress-ddoc/project-progress', {
-      group: true
-    }).then((result) => {
-      if(result.rows) {
-        setProjectsProgress(result.rows)
         if(!initiallyFetched) {
           setInitiallyFetched(true)
         }
         setFetched(true)
       }
-    }).catch((err: Error) => {
-      console.log(err)
+    } catch(err) {
+      throw err
+    }
+  }
+
+  async function getProjectsProgress() {
+    setFetched(false)
+    try {
+      await db.put(projects_progress_ddoc)
+    } catch (err) {
+      if(err.name !== 'conflict') {
+        throw err
+      }
+    }
+    const result = await db.query('projects-progress-ddoc/project-progress', {
+      group: true
     })
+    if(result.rows) {
+      setProjectsProgress(result.rows)
+      await getProjects()
+    }
   }
 
   const [projects, setProjects] = useState([])
