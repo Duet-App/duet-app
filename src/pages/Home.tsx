@@ -55,6 +55,43 @@ const Home: React.FC = () => {
 
   let db: PouchDB.Database
 
+  const setupIndexes = async () => {
+    await db.createIndex({
+      index: {
+        fields: ['timestamps.created']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['scheduled_date']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['status', 'type', 'project_id']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['status', 'type', 'scheduled_date']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['type']
+      }
+    })
+    await db.createIndex({
+      index: {
+        fields: ['timestamps.updated'],
+      }
+    })
+    await setupTagsDDoc()
+    // await setupProjectsDDoc()
+    // await setupProjectsProgressDDoc()
+    // await setupProjectsNotesDDoc()
+  }
+
   if(isPlatform('capacitor')) {
     document.addEventListener('deviceready', async function () {
       PouchDB.plugin(CordovaSqlite)
@@ -87,50 +124,13 @@ const Home: React.FC = () => {
           })
         })
       }
+
+      setupIndexes()
     })
   } else {
     db = new PouchDB('duet')
   }
   PouchDB.plugin(PouchFind)
-
-  const setupIndexes = async () => {
-    await db.createIndex({
-      index: {
-        fields: ['timestamps.created']
-      }
-    })
-    await db.createIndex({
-      index: {
-        fields: ['scheduled_date']
-      }
-    })
-    await db.createIndex({
-      index: {
-        fields: ['status', 'type', 'project_id']
-      }
-    })
-    await db.createIndex({
-      index: {
-        fields: ['status', 'type', 'scheduled_date']
-      }
-    })
-    await db.createIndex({
-      index: {
-        fields: ['type']
-      }
-    })
-    await db.createIndex({
-      index: {
-        fields: ['timestamps.updated'],
-        type: 'json'
-      }
-    })
-    await setupTagsDDoc()
-    await setupProjectsDDoc()
-    await setupProjectsProgressDDoc()
-    await setupProjectsNotesDDoc()
-  }
-
   setupIndexes()
 
   const tags_ddoc = {
@@ -256,15 +256,16 @@ const Home: React.FC = () => {
   }
 
   const setupProjectsDDoc = async () => {
-    let current_projects_ddoc_rev
-    db.get("_design/projects-ddoc").then((response) => {
-      current_projects_ddoc_rev = response._rev
-    })
+    // let current_projects_ddoc_rev
+    // db.get("_design/projects-ddoc").then((response) => {
+    //   current_projects_ddoc_rev = response._rev
+    // })
     try {
-      await db.put({
-        ...projects_ddoc,
-        _rev: current_projects_ddoc_rev
-      });
+      // await db.put({
+      //   ...projects_ddoc,
+      //   _rev: current_projects_ddoc_rev
+      // });
+      await db.put(projects_ddoc)
     } catch (err) {
       if (err.name !== 'conflict') {
         throw err;
