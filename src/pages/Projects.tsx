@@ -9,6 +9,7 @@ import { Redirect, Route, RouteComponentProps } from "react-router"
 import ProjectDetailsPage from "./ProjectDetails"
 import TaskDetails from "./TaskDetails"
 import useScreenSize from "../hooks/useScreenSize"
+import { projects_progress_ddoc } from "../dbHelper"
 
 const ProjectsPage: React.FC = () => {
 
@@ -24,9 +25,18 @@ const ProjectsPage: React.FC = () => {
   const screenSize = useScreenSize()
 
   useIonViewDidEnter(() => {
-    function getProjects() {
+    async function getProjects() {
       setFetched(false)
-      db.find({
+      try {
+        await db.createIndex({
+          index: {
+            fields: ['timestamps.updated'],
+          }
+        })
+      } catch (err) {
+        throw err
+      }
+      const result = await db.find({
         selector: {
           type: "project",
           "timestamps.updated": {
@@ -35,34 +45,34 @@ const ProjectsPage: React.FC = () => {
         },
         sort: [{'timestamps.updated': 'desc'}]
       })
-      .then((result: object | null) => {
-        if(result) {
-          setProjects(result.docs)
-          getProjectsProgress()
+      if(result) {
+        setProjects(result.docs)
+        if(!initiallyFetched) {
+          setInitiallyFetched(true)
         }
-      }).catch((err: Error) => {
-        console.log(err)
-      })
+        setFetched(true)
+      }
     }
 
     async function getProjectsProgress() {
-      db.query('projects-progress-ddoc/project-progress', {
-        group: true
-      }).then((result) => {
-        if(result.rows) {
-          console.log(result)
-          setProjectsProgress(result.rows)
-          if(!initiallyFetched) {
-            setInitiallyFetched(true)
-          }
-          setFetched(true)
+      setFetched(false)
+      try {
+        await db.put(projects_progress_ddoc)
+      } catch (err) {
+        if(err.name !== 'conflict') {
+          throw err
         }
-      }).catch((err: Error) => {
-        console.log(err)
+      }
+      const result = await db.query('projects-progress-ddoc/project-progress', {
+        group: true
       })
+      if(result.rows) {
+        setProjectsProgress(result.rows)
+        await getProjects()
+      }
     }
 
-    getProjects()
+    getProjectsProgress()
   })
 
   const [projects, setProjects] = useState([])
