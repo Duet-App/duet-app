@@ -20,25 +20,30 @@ const NotesTile: React.FC = () => {
   const [notes, setNotes] = useState([])
 
   useIonViewDidEnter(() => {
-    function getNotes() {
-      db.find({
-        selector: {
-          "timestamps.updated": {
-            "$gt": null
+    async function getNotes() {
+      try {
+        await db.createIndex({
+          index: {
+            fields: ['timestamps.updated'],
+          }
+        })
+        const result: object | null = await db.find({
+          selector: {
+            "timestamps.updated": {
+              "$gt": null
+            },
+            type: "note",
           },
-          type: "note",
-        },
-        // "use_index": ['inbox-items', 'inbox-items'],
-        sort: [{'timestamps.updated': 'desc'}],
-        limit: 3
-      })
-      .then((result: object | null) => {
+          // "use_index": ['inbox-items', 'inbox-items'],
+          sort: [{'timestamps.updated': 'desc'}],
+          limit: 3
+        })
         if(result) {
           setNotes(result.docs)
         }
-      }).catch((err: Error) => {
-        console.log(err)
-      })
+      } catch (err) {
+        throw err
+      }
     }
 
     getNotes()
